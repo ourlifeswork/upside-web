@@ -317,14 +317,9 @@
         this.animationReady = true;
         this.animate();
 
-        // Start showing connections immediately
         this.showConnections = true;
-
-        // Calculate initial connections
         this.connections = this.calculateConnections();
         this.createConnectionLines();
-
-        // Transform points after connections are created
         this.transformConnectedPoints();
 
         // Set up event listeners
@@ -627,7 +622,6 @@
             }
             text.setAttribute("fill", textColor);
 
-            text.setAttribute("opacity", "0"); // Hidden initially
             text.textContent = point.code;
 
             // Add elements to the group
