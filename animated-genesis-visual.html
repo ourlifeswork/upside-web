@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
+
     body {
       margin: 0;
       padding: 0;
@@ -23,7 +24,7 @@
       height: 100vh;
       background-color: transparent;
     }
-    
+
     svg {
       position: absolute;
       top: 0;
@@ -33,6 +34,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container" id="container">
     <svg id="svg"></svg>
@@ -60,65 +62,210 @@
 
     // Upside attribution data
     const codes = {
-      people: [
-        { code: "Edith Harris (CEO)", description: "Chief Executive Officer" },
-        { code: "VP Legal, Vonda H.", description: "Vice President of Legal" },
-        { code: "Marcus Chen (CTO)", description: "Chief Technology Officer" },
-        { code: "Sarah Kim (CFO)", description: "Chief Financial Officer" },
-        { code: "Director IT, James R.", description: "IT Director" },
-        { code: "Lisa Wong (CPO)", description: "Chief Product Officer" },
-        { code: "David Miller (VP Sales)", description: "Vice President of Sales" },
-        { code: "Head of Security, Alex T.", description: "Security Lead" },
-        { code: "Michael Johnson (COO)", description: "Chief Operating Officer" },
-        { code: "Emma Rodriguez (CMO)", description: "Chief Marketing Officer" },
+      people: [{
+          code: "Edith Harris (CEO)",
+          description: "Chief Executive Officer"
+        },
+        {
+          code: "VP Legal, Vonda H.",
+          description: "Vice President of Legal"
+        },
+        {
+          code: "Marcus Chen (CTO)",
+          description: "Chief Technology Officer"
+        },
+        {
+          code: "Sarah Kim (CFO)",
+          description: "Chief Financial Officer"
+        },
+        {
+          code: "Director IT, James R.",
+          description: "IT Director"
+        },
+        {
+          code: "Lisa Wong (CPO)",
+          description: "Chief Product Officer"
+        },
+        {
+          code: "David Miller (VP Sales)",
+          description: "Vice President of Sales"
+        },
+        {
+          code: "Head of Security, Alex T.",
+          description: "Security Lead"
+        },
+        {
+          code: "Michael Johnson (COO)",
+          description: "Chief Operating Officer"
+        },
+        {
+          code: "Emma Rodriguez (CMO)",
+          description: "Chief Marketing Officer"
+        },
       ],
-      signals: [
-        { code: "Opened Sales Deck", description: "Viewed presentation materials" },
-        { code: "Clicked Ad", description: "Engaged with advertising content" },
-        { code: "Shared Org Chart", description: "Distributed organizational information" },
-        { code: "Downloaded Whitepaper", description: "Accessed thought leadership content" },
-        { code: "Visited Pricing Page", description: "Reviewed pricing information" },
-        { code: "Watched Demo Video", description: "Consumed product demonstration" },
-        { code: "Joined Webinar", description: "Attended online presentation" },
-        { code: "Requested Trial", description: "Initiated product evaluation" },
-        { code: "Viewed Case Study", description: "Examined success stories" },
-        { code: "Subscribed to Newsletter", description: "Opted in for regular updates" },
+      signals: [{
+          code: "Opened Sales Deck",
+          description: "Viewed presentation materials"
+        },
+        {
+          code: "Clicked Ad",
+          description: "Engaged with advertising content"
+        },
+        {
+          code: "Shared Org Chart",
+          description: "Distributed organizational information"
+        },
+        {
+          code: "Downloaded Whitepaper",
+          description: "Accessed thought leadership content"
+        },
+        {
+          code: "Visited Pricing Page",
+          description: "Reviewed pricing information"
+        },
+        {
+          code: "Watched Demo Video",
+          description: "Consumed product demonstration"
+        },
+        {
+          code: "Joined Webinar",
+          description: "Attended online presentation"
+        },
+        {
+          code: "Requested Trial",
+          description: "Initiated product evaluation"
+        },
+        {
+          code: "Viewed Case Study",
+          description: "Examined success stories"
+        },
+        {
+          code: "Subscribed to Newsletter",
+          description: "Opted in for regular updates"
+        },
       ],
-      events: [
-        { code: "Warriors Game", description: "Corporate entertainment event" },
-        { code: "Internal Demo Review", description: "Product demonstration session" },
-        { code: "Executive Offsite", description: "Leadership retreat meeting" },
-        { code: "Industry Conference", description: "Professional networking event" },
-        { code: "Board Meeting", description: "Executive governance session" },
-        { code: "Customer Advisory", description: "Strategic feedback session" },
-        { code: "Partner Summit", description: "Ecosystem collaboration event" },
-        { code: "Product Launch", description: "New feature announcement" },
-        { code: "Annual Sales Kickoff", description: "Yearly sales strategy meeting" },
-        { code: "Quarterly Business Review", description: "Performance assessment meeting" },
+      events: [{
+          code: "Warriors Game",
+          description: "Corporate entertainment event"
+        },
+        {
+          code: "Internal Demo Review",
+          description: "Product demonstration session"
+        },
+        {
+          code: "Executive Offsite",
+          description: "Leadership retreat meeting"
+        },
+        {
+          code: "Industry Conference",
+          description: "Professional networking event"
+        },
+        {
+          code: "Board Meeting",
+          description: "Executive governance session"
+        },
+        {
+          code: "Customer Advisory",
+          description: "Strategic feedback session"
+        },
+        {
+          code: "Partner Summit",
+          description: "Ecosystem collaboration event"
+        },
+        {
+          code: "Product Launch",
+          description: "New feature announcement"
+        },
+        {
+          code: "Annual Sales Kickoff",
+          description: "Yearly sales strategy meeting"
+        },
+        {
+          code: "Quarterly Business Review",
+          description: "Performance assessment meeting"
+        },
       ],
-      engagement_types: [
-        { code: "AE Email Intro", description: "Account Executive introduction" },
-        { code: "Legal Redlines Sent", description: "Contract markup delivered" },
-        { code: "Technical Deep Dive", description: "Product architecture review" },
-        { code: "Security Review", description: "Compliance assessment meeting" },
-        { code: "Pricing Discussion", description: "Commercial terms negotiation" },
-        { code: "Reference Call", description: "Customer testimonial session" },
-        { code: "POC Kickoff", description: "Proof of concept initiation" },
-        { code: "Executive Briefing", description: "C-level strategic discussion" },
-        { code: "Product Roadmap Review", description: "Future development planning" },
-        { code: "Implementation Planning", description: "Deployment strategy session" },
+      engagement_types: [{
+          code: "AE Email Intro",
+          description: "Account Executive introduction"
+        },
+        {
+          code: "Legal Redlines Sent",
+          description: "Contract markup delivered"
+        },
+        {
+          code: "Technical Deep Dive",
+          description: "Product architecture review"
+        },
+        {
+          code: "Security Review",
+          description: "Compliance assessment meeting"
+        },
+        {
+          code: "Pricing Discussion",
+          description: "Commercial terms negotiation"
+        },
+        {
+          code: "Reference Call",
+          description: "Customer testimonial session"
+        },
+        {
+          code: "POC Kickoff",
+          description: "Proof of concept initiation"
+        },
+        {
+          code: "Executive Briefing",
+          description: "C-level strategic discussion"
+        },
+        {
+          code: "Product Roadmap Review",
+          description: "Future development planning"
+        },
+        {
+          code: "Implementation Planning",
+          description: "Deployment strategy session"
+        },
       ],
-      roles_tags: [
-        { code: "Champion Identified", description: "Internal advocate confirmed" },
-        { code: "Former Customer", description: "Previous client relationship" },
-        { code: "Decision Maker", description: "Final approval authority" },
-        { code: "Technical Evaluator", description: "Product assessment lead" },
-        { code: "Budget Holder", description: "Financial approval authority" },
-        { code: "Influencer", description: "Opinion leader in organization" },
-        { code: "End User", description: "Product usage stakeholder" },
-        { code: "Procurement Lead", description: "Vendor management contact" },
-        { code: "Executive Sponsor", description: "Senior leadership support" },
-        { code: "Project Manager", description: "Implementation coordinator" },
+      roles_tags: [{
+          code: "Champion Identified",
+          description: "Internal advocate confirmed"
+        },
+        {
+          code: "Former Customer",
+          description: "Previous client relationship"
+        },
+        {
+          code: "Decision Maker",
+          description: "Final approval authority"
+        },
+        {
+          code: "Technical Evaluator",
+          description: "Product assessment lead"
+        },
+        {
+          code: "Budget Holder",
+          description: "Financial approval authority"
+        },
+        {
+          code: "Influencer",
+          description: "Opinion leader in organization"
+        },
+        {
+          code: "End User",
+          description: "Product usage stakeholder"
+        },
+        {
+          code: "Procurement Lead",
+          description: "Vendor management contact"
+        },
+        {
+          code: "Executive Sponsor",
+          description: "Senior leadership support"
+        },
+        {
+          code: "Project Manager",
+          description: "Implementation coordinator"
+        },
       ],
     };
 
@@ -170,7 +317,7 @@
         this.animationReady = true;
         this.animate();
 
-        // Start showing connections immediately without waiting for click
+        // Start showing connections automatically on load
         setTimeout(() => {
           this.showConnections = true;
 
@@ -182,12 +329,12 @@
           setTimeout(() => {
             this.transformConnectedPoints();
           }, 800);
-        }, 500); // Small delay to allow initial setup
+        }, 1000); // Start after 1 second to allow initial setup
 
         // Set up event listeners
         window.addEventListener("resize", () => this.handleResize());
 
-        // We still keep the click handler for toggling connections on/off
+        // Keep the click handler for toggling connections on/off
         this.container.addEventListener("click", () => this.handleClick());
       }
 
@@ -1236,7 +1383,10 @@
 
             // Only include points that are not too far away
             if (distance <= this.maxConnectionCreateDistance) {
-              distances.push({ index: j, distance });
+              distances.push({
+                index: j,
+                distance
+              });
             }
           }
 
@@ -1316,4 +1466,5 @@
     });
   </script>
 </body>
+
 </html>
