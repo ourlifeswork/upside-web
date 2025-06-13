@@ -328,14 +328,11 @@
           // Transform points after connections are created
           setTimeout(() => {
             this.transformConnectedPoints();
-          }, 800);
-        }, 500); // Small delay to allow initial setup
+          }, 400);
+        }, 200); // Small delay to allow initial setup
 
         // Set up event listeners
         window.addEventListener("resize", () => this.handleResize());
-
-        // We still keep the click handler for toggling connections on/off
-        this.container.addEventListener("click", () => this.handleClick());
       }
 
       updateSize() {
@@ -1462,8 +1459,7 @@
     // Initialize the animation when the page loads
     window.addEventListener('load', () => {
       const container = document.getElementById('container');
-      const graph = new KnowledgeGraphAnimation(container);
-      graph.handleClick();
+      new KnowledgeGraphAnimation(container);
     });
   </script>
 </body>
