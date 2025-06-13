@@ -317,19 +317,15 @@
         this.animationReady = true;
         this.animate();
 
-        // Start showing connections immediately without waiting for click
-        setTimeout(() => {
-          this.showConnections = true;
+        // Start showing connections immediately
+        this.showConnections = true;
 
-          // Calculate initial connections
-          this.connections = this.calculateConnections();
-          this.createConnectionLines();
+        // Calculate initial connections
+        this.connections = this.calculateConnections();
+        this.createConnectionLines();
 
-          // Transform points after connections are created
-          setTimeout(() => {
-            this.transformConnectedPoints();
-          }, 400);
-        }, 200); // Small delay to allow initial setup
+        // Transform points after connections are created
+        this.transformConnectedPoints();
 
         // Set up event listeners
         window.addEventListener("resize", () => this.handleResize());
@@ -799,48 +795,6 @@
 
         // Restart animation
         this.animationReady = true;
-      }
-
-      handleClick() {
-        // Toggle connections visibility
-        this.showConnections = !this.showConnections;
-
-        if (this.showConnections) {
-          // Calculate connections and create lines
-          this.connections = this.calculateConnections();
-          this.createConnectionLines();
-
-          // Show points info after connections appear
-          setTimeout(() => {
-            this.transformConnectedPoints();
-          }, 600);
-        } else {
-          // Hide and remove all connections
-          const connectionLines = document.querySelectorAll('line[id^="conn-"]');
-          anime({
-            targets: connectionLines,
-            opacity: 0,
-            duration: 300,
-            easing: "easeOutQuad",
-            complete: () => {
-              // Remove connection lines
-              connectionLines.forEach((line) => {
-                if (line && line.parentNode) {
-                  line.parentNode.removeChild(line);
-                }
-              });
-
-              // Shrink expanded points
-              const expandedPoints = this.points.filter((p) => p.expanded && !p.removed);
-              expandedPoints.forEach((point) => {
-                this.shrinkPointAndHideText(point.id);
-              });
-
-              // Clear connections array
-              this.connections = [];
-            },
-          });
-        }
       }
 
       transformConnectedPoints() {
