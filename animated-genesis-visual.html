@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upside Attribution Graph</title>
   <!-- Load anime.js from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
@@ -177,19 +177,20 @@
         this.createConnectionLines();
         this.transformConnectedPoints();
 
-        // Handle window resize
+        // Resize handling
         window.addEventListener("resize", () => this.handleResize());
       }
 
       updateSize() {
         this.width = this.container.clientWidth;
         this.height = this.container.clientHeight;
-        this.svg.setAttribute("width", this.width.toString());
-        this.svg.setAttribute("height", this.height.toString());
+        this.svg.setAttribute("width", this.width);
+        this.svg.setAttribute("height", this.height);
       }
 
       getRandomPointValue() {
         try {
+          const contentTypes = ["people", "signals", "events", "engagement_types", "roles_tags"];
           const typeRoll = Math.random();
           let selectedType;
           if (typeRoll < 0.2) selectedType = "people";
@@ -198,38 +199,52 @@
           else if (typeRoll < 0.8) selectedType = "engagement_types";
           else selectedType = "roles_tags";
 
-          const list = codes[selectedType];
-          if (!list || list.length === 0) {
+          const dataList = codes[selectedType];
+          if (!dataList || dataList.length === 0) {
             return { code: "Unknown", codeType: selectedType, isCode: false };
           }
 
-          let attempts = 0, item;
+          let attempts = 0, selectedItem, selectedCode;
           while (attempts < 20) {
-            item = list[Math.floor(Math.random() * list.length)];
-            if (!this.usedCodes.has(item.code)) {
-              this.usedCodes.add(item.code);
-              return { code: item.code, description: item.description, codeType: selectedType, isCode: false };
+            const idx = Math.floor(Math.random() * dataList.length);
+            selectedItem = dataList[idx];
+            selectedCode = selectedItem.code;
+            if (!this.usedCodes.has(selectedCode)) {
+              this.usedCodes.add(selectedCode);
+              break;
             }
             attempts++;
           }
 
-          // fallback
-          return { code: this.generateUniqueCode(selectedType), description: "", codeType: selectedType, isCode: false };
-        } catch (e) {
-          console.error(e);
+          if (attempts >= 20 || !selectedItem) {
+            const uniqueCode = this.generateUniqueCode(selectedType);
+            return { code: uniqueCode, description: `Generated ${selectedType}`, codeType: selectedType, isCode: false };
+          }
+
+          return { code: selectedItem.code, description: selectedItem.description, codeType: selectedType, isCode: false };
+        } catch (err) {
+          console.error("Error selecting point value:", err);
           return { code: "ERROR", codeType: "people", isCode: false };
         }
       }
 
       generateUniqueCode(type) {
-        const id = Math.floor(Math.random() * 10000);
+        const uniqueId = Math.floor(Math.random() * 10000);
         switch (type) {
-          case "people": return `Director ${id}`;
-          case "signals": return `Viewed Resource ${id}`;
-          case "events": return `Session ${id}`;
-          case "engagement_types": return `Call ${id}`;
-          case "roles_tags": return `Stakeholder ${id}`;
-          default: return `Unknown ${id}`;
+          case "people":
+            const fn = ["John","Jane","Alex","Sam"][Math.floor(Math.random()*4)];
+            const ln = ["Smith","Jones","Lee","Brown"][Math.floor(Math.random()*4)];
+            return `Analyst ${fn} ${ln.charAt(0)}.`;
+          case "signals":
+            return `Viewed Resource ${uniqueId}`;
+          case "events":
+            return `Strategy Session ${uniqueId}`;
+          case "engagement_types":
+            return `Product Call ${uniqueId}`;
+          case "roles_tags":
+            return `Key Stakeholder ${uniqueId}`;
+          default:
+            return `Unknown ${uniqueId}`;
         }
       }
 
@@ -238,129 +253,96 @@
         this.usedCodes.clear();
         for (let i = 0; i < this.numPoints; i++) {
           const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
-          const angle = Math.random() * 2 * Math.PI;
-          const vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-          const vy = Math.sin(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-          const radiusVariation = 1 + (Math.random() * 2 - 1) * this.pointRadiusVariation;
-          const radius = this.pointRadius * radiusVariation;
-
-          this.points.push({
-            id: i,
-            x: Math.random() * this.width,
-            y: Math.random() * this.height,
-            vx, vy, radius,
-            transformed: false,
-            expanded: false,
-            removed: false,
-          });
+          const angle = Math.random() * Math.PI * 2;
+          const vx = Math.cos(angle) * speed * (Math.random()>0.5?1:-1);
+          const vy = Math.sin(angle) * speed * (Math.random()>0.5?1:-1);
+          const radius = this.pointRadius * (1 + (Math.random()*2-1)*this.pointRadiusVariation);
+          this.points.push({ id:i, x:Math.random()*this.width, y:Math.random()*this.height, vx, vy, radius, expanded:false, removed:false });
         }
       }
 
       setupSVG() {
-        while (this.svg.firstChild) {
-          this.svg.removeChild(this.svg.firstChild);
-        }
-
-        const linesLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        linesLayer.id = "lines-layer";
-
-        const effectsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        effectsLayer.id = "effects-layer";
-
-        const pointsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        pointsLayer.id = "points-layer";
-
+        while (this.svg.firstChild) this.svg.removeChild(this.svg.firstChild);
+        const linesLayer   = document.createElementNS("http://www.w3.org/2000/svg","g"); linesLayer.id="lines-layer";
+        const effectsLayer = document.createElementNS("http://www.w3.org/2000/svg","g"); effectsLayer.id="effects-layer";
+        const pointsLayer  = document.createElementNS("http://www.w3.org/2000/svg","g"); pointsLayer.id="points-layer";
         this.svg.append(linesLayer, effectsLayer, pointsLayer);
 
-        this.points.forEach((p) => {
-          if (p.removed) return;
-          if (!p.code) {
+        this.points.forEach(pt => {
+          if (pt.removed) return;
+          if (!pt.code) {
             const val = this.getRandomPointValue();
-            p.code = val.code;
-            p.codeType = val.codeType;
-            p.description = val.description;
+            pt.code = val.code;
+            pt.codeType = val.codeType;
           }
-
-          const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-          g.id = `point-${p.id}`;
-          g.setAttribute("transform", `translate(${p.x},${p.y})`);
-
-          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-          rect.id = `rect-${p.id}`;
-          rect.setAttribute("x", -p.radius);
-          rect.setAttribute("y", -p.radius);
-          rect.setAttribute("width", p.radius * 2);
-          rect.setAttribute("height", p.radius * 2);
-          rect.setAttribute("rx", p.radius);
-          rect.setAttribute("ry", p.radius);
+          const group = document.createElementNS("http://www.w3.org/2000/svg","g");
+          group.id = `point-${pt.id}`;
+          group.setAttribute("transform", `translate(${pt.x},${pt.y})`);
+          const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+          rect.id = `rect-${pt.id}`;
+          rect.setAttribute("x", -pt.radius);
+          rect.setAttribute("y", -pt.radius);
+          rect.setAttribute("width", pt.radius*2);
+          rect.setAttribute("height", pt.radius*2);
+          rect.setAttribute("rx", pt.radius);
+          rect.setAttribute("ry", pt.radius);
           rect.setAttribute("fill", COLORS.WHITE);
           rect.setAttribute("stroke", COLORS.CONNECTION);
           rect.setAttribute("stroke-width", "1.5");
-
-          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          text.id = `text-${p.id}`;
+          const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+          text.id = `text-${pt.id}`;
           text.setAttribute("x", 0);
           text.setAttribute("y", 0);
           text.setAttribute("text-anchor", "middle");
           text.setAttribute("dominant-baseline", "middle");
           text.setAttribute("font-size", "10");
           text.setAttribute("opacity", "0");
-          text.textContent = p.code;
-
-          g.append(rect, text);
-          pointsLayer.appendChild(g);
+          text.textContent = pt.code;
+          group.append(rect, text);
+          pointsLayer.appendChild(group);
         });
       }
 
       animate() {
         if (!this.animationReady) return;
-
-        this.points.forEach((p) => {
-          if (p.removed) return;
-          // simple centering force
-          const cx = this.width / 2, cy = this.height / 2;
-          p.vx += (cx - p.x) * 1e-6;
-          p.vy += (cy - p.y) * 1e-6;
-          p.x += p.vx;
-          p.y += p.vy;
-          if (p.x < 0 || p.x > this.width) p.vx *= -1;
-          if (p.y < 0 || p.y > this.height) p.vy *= -1;
-          p.x = Math.max(0, Math.min(this.width, p.x));
-          p.y = Math.max(0, Math.min(this.height, p.y));
-          const g = document.getElementById(`point-${p.id}`);
-          if (g) g.setAttribute("transform", `translate(${p.x},${p.y})`);
+        this.points.forEach(pt => {
+          if (pt.removed) return;
+          const cx = this.width/2, cy = this.height/2;
+          pt.vx += (cx-pt.x)*1e-6;
+          pt.vy += (cy-pt.y)*1e-6;
+          pt.x += pt.vx;
+          pt.y += pt.vy;
+          if (pt.x<0||pt.x>this.width) pt.vx*=-1;
+          if (pt.y<0||pt.y>this.height) pt.vy*=-1;
+          pt.x = Math.max(0,Math.min(this.width,pt.x));
+          pt.y = Math.max(0,Math.min(this.height,pt.y));
+          const g = document.getElementById(`point-${pt.id}`);
+          if (g) g.setAttribute("transform", `translate(${pt.x},${pt.y})`);
         });
-
         if (this.showConnections) this.updateConnections();
         requestAnimationFrame(() => this.animate());
       }
 
       calculateConnections() {
-        const valid = this.points.filter(p => !p.removed);
+        const valid = this.points.filter(p=>!p.removed);
         const conns = [];
         const now = Date.now();
-        valid.forEach((p1, i) => {
-          const dists = [];
-          valid.forEach((p2, j) => {
-            if (i === j) return;
-            const dx = p1.x - p2.x, dy = p1.y - p2.y, dist = Math.hypot(dx, dy);
-            if (dist <= this.maxConnectionCreateDistance) dists.push({ idx: j, dist });
-          });
-          dists.sort((a, b) => a.dist - b.dist);
-          dists.slice(0, 2).forEach(n => {
-            if (i < n.idx) {
-              const p2 = valid[n.idx];
-              conns.push({
-                id: `${p1.id}-${p2.id}`,
-                x1: p1.x, y1: p1.y,
-                x2: p2.x, y2: p2.y,
-                sourceId: p1.id,
-                targetId: p2.id,
-                createdAt: now
-              });
+        for (let i=0;i<valid.length;i++){
+          const p1=valid[i], dists=[];
+          for (let j=0;j<valid.length;j++){
+            if(i===j) continue;
+            const p2=valid[j];
+            const dx = p1.x-p2.x, dy=p1.y-p2.y, dist=Math.hypot(dx,dy);
+            if(dist<=this.maxConnectionCreateDistance) dists.push({idx:j,dist});
+          }
+          dists.sort((a,b)=>a.dist-b.dist);
+          for (let k=0;k<Math.min(2,dists.length);k++){
+            const other = dists[k].idx;
+            if(i<other){
+              conns.push({ id:`${p1.id}-${valid[other].id}`, x1:p1.x,y1:p1.y,x2:valid[other].x,y2:valid[other].y, sourceId:p1.id, targetId:valid[other].id, createdAt:now });
             }
-          });
-        });
+          }
+        }
         return conns;
       }
 
@@ -377,7 +359,7 @@
           line.setAttribute("y2", conn.y2);
           line.setAttribute("stroke", COLORS.CONNECTION);
           line.setAttribute("stroke-width", "1.5");
-          line.setAttribute("opacity", "1");  // always fully visible
+          line.setAttribute("opacity", "1");
           layer.appendChild(line);
         });
       }
@@ -385,10 +367,7 @@
       updateConnections() {
         const updated = this.calculateConnections();
         const layer = document.getElementById("lines-layer");
-        const keep = new Set();
-
         updated.forEach(conn => {
-          keep.add(conn.id);
           let line = document.getElementById(`conn-${conn.id}`);
           if (line) {
             line.setAttribute("x1", conn.x1);
@@ -408,43 +387,41 @@
             layer.appendChild(line);
           }
         });
-
         // remove stale
+        const keep = new Set(updated.map(c=>c.id));
         document.querySelectorAll('line[id^="conn-"]').forEach(l => {
           const id = l.id.replace('conn-','');
           if (!keep.has(id)) layer.removeChild(l);
         });
-
         this.connections = updated;
       }
 
       transformConnectedPoints() {
         const active = this.connections;
-        const ids = new Set(active.flatMap(c => [c.sourceId, c.targetId]));
-        const toExpand = this.points.filter(p => ids.has(p.id) && !p.expanded && !p.removed).slice(0, 15);
-        toExpand.forEach((p, i) => {
-          setTimeout(() => this.expandPointAndShowText(p.id), i * 50);
+        const ids = new Set(active.flatMap(c=>[c.sourceId,c.targetId]));
+        const toExpand = this.points.filter(p=>ids.has(p.id)&&!p.expanded&&!p.removed).slice(0,15);
+        toExpand.forEach((pt,i)=>{
+          setTimeout(()=>this.expandPointAndShowText(pt.id), i*50);
         });
       }
 
-      expandPointAndShowText(pointId) {
-        const rect = document.getElementById(`rect-${pointId}`);
-        const text = document.getElementById(`text-${pointId}`);
-        const p = this.points.find(x => x.id === pointId);
-        if (!rect || !text || !p) return;
-        p.expanded = true;
-        const orig = p.code || "";
-        text.setAttribute("opacity", "1");
+      expandPointAndShowText(id) {
+        const rect = document.getElementById(`rect-${id}`);
+        const text = document.getElementById(`text-${id}`);
+        const pt = this.points.find(p=>p.id===id);
+        if (!rect||!text||!pt) return;
+        pt.expanded = true;
+        const orig = pt.code||"";
+        const height = 24;
+        const width = Math.max(pt.codeType==="people"||pt.codeType==="roles_tags"?60:140, Math.min(300, orig.length * 8));
+        rect.setAttribute("x", -width/2);
+        rect.setAttribute("y", -height/2);
+        rect.setAttribute("width", width);
+        rect.setAttribute("height", height);
+        rect.setAttribute("rx", height/2);
+        rect.setAttribute("ry", height/2);
+        text.setAttribute("opacity","1");
         text.textContent = orig;
-        // pill shape
-        const h = 24;
-        const w = Math.max(orig.length * 8, 140);
-        rect.setAttribute("x", -w / 2);
-        rect.setAttribute("y", -h / 2);
-        rect.setAttribute("width", w);
-        rect.setAttribute("height", h);
-        rect.setAttribute("rx", h / 2);
-        rect.setAttribute("ry", h / 2);
       }
 
       handleResize() {
