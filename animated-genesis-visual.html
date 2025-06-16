@@ -378,6 +378,11 @@
 						};
 					}
 
+					// ————— Reset uniqueness when we've used ≥80% of this category —————
+					if (this.usedCodes.size >= dataList.length * 0.8) {
+						this.usedCodes.clear();
+					}
+
 					// Try to find an unused code
 					let attempts = 0;
 					let selectedItem;
@@ -412,6 +417,7 @@
 						};
 					}
 
+					// Return the selected (and newly‐marked) code
 					return {
 						code: selectedItem.code,
 						description: selectedItem.description,
