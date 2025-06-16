@@ -2,1469 +2,1470 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upside Attribution Graph</title>
-  <!-- Load anime.js from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Upside Attribution Graph</title>
+	<!-- Load anime.js from CDN -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: transparent;
-      font-family: 'Inter', sans-serif;
-    }
+		body {
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: transparent;
+			font-family: 'Inter', sans-serif;
+		}
 
-    .container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background-color: transparent;
-    }
+		.container {
+			position: relative;
+			width: 100vw;
+			height: 100vh;
+			background-color: transparent;
+		}
 
-    svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+		svg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 </head>
 
 <body>
-  <div class="container" id="container">
-    <svg id="svg"></svg>
-  </div>
-
-  <script>
-    // Color constants for Upside attribution data
-    const COLORS = {
-      PEOPLE: "#D94B50",
-      PEOPLE_DARK: "#B73E42",
-      SIGNALS: "#E6774A",
-      SIGNALS_DARK: "#D4653F",
-      EVENTS: "#835CE0",
-      EVENTS_DARK: "#7049C7",
-      ENGAGEMENT: "#347BD1",
-      ENGAGEMENT_DARK: "#2D6BB8",
-      ROLES: "#66AF48",
-      ROLES_DARK: "#5A9B3F",
-      FALLBACK: "#F1CA66",
-      FALLBACK_DARK: "#E8B955",
-      CONNECTION: "#c7cacd",
-      WHITE: "white",
-      BLACK: "black",
-    };
-
-    // Upside attribution data
-    const codes = {
-      people: [{
-          code: "Edith Harris (CEO)",
-          description: "Chief Executive Officer"
-        },
-        {
-          code: "VP Legal, Vonda H.",
-          description: "Vice President of Legal"
-        },
-        {
-          code: "Marcus Chen (CTO)",
-          description: "Chief Technology Officer"
-        },
-        {
-          code: "Sarah Kim (CFO)",
-          description: "Chief Financial Officer"
-        },
-        {
-          code: "Director IT, James R.",
-          description: "IT Director"
-        },
-        {
-          code: "Lisa Wong (CPO)",
-          description: "Chief Product Officer"
-        },
-        {
-          code: "David Miller (VP Sales)",
-          description: "Vice President of Sales"
-        },
-        {
-          code: "Head of Security, Alex T.",
-          description: "Security Lead"
-        },
-        {
-          code: "Michael Johnson (COO)",
-          description: "Chief Operating Officer"
-        },
-        {
-          code: "Emma Rodriguez (CMO)",
-          description: "Chief Marketing Officer"
-        },
-      ],
-      signals: [{
-          code: "Opened Sales Deck",
-          description: "Viewed presentation materials"
-        },
-        {
-          code: "Clicked Ad",
-          description: "Engaged with advertising content"
-        },
-        {
-          code: "Shared Org Chart",
-          description: "Distributed organizational information"
-        },
-        {
-          code: "Downloaded Whitepaper",
-          description: "Accessed thought leadership content"
-        },
-        {
-          code: "Visited Pricing Page",
-          description: "Reviewed pricing information"
-        },
-        {
-          code: "Watched Demo Video",
-          description: "Consumed product demonstration"
-        },
-        {
-          code: "Joined Webinar",
-          description: "Attended online presentation"
-        },
-        {
-          code: "Requested Trial",
-          description: "Initiated product evaluation"
-        },
-        {
-          code: "Viewed Case Study",
-          description: "Examined success stories"
-        },
-        {
-          code: "Subscribed to Newsletter",
-          description: "Opted in for regular updates"
-        },
-      ],
-      events: [{
-          code: "Warriors Game",
-          description: "Corporate entertainment event"
-        },
-        {
-          code: "Internal Demo Review",
-          description: "Product demonstration session"
-        },
-        {
-          code: "Executive Offsite",
-          description: "Leadership retreat meeting"
-        },
-        {
-          code: "Industry Conference",
-          description: "Professional networking event"
-        },
-        {
-          code: "Board Meeting",
-          description: "Executive governance session"
-        },
-        {
-          code: "Customer Advisory",
-          description: "Strategic feedback session"
-        },
-        {
-          code: "Partner Summit",
-          description: "Ecosystem collaboration event"
-        },
-        {
-          code: "Product Launch",
-          description: "New feature announcement"
-        },
-        {
-          code: "Annual Sales Kickoff",
-          description: "Yearly sales strategy meeting"
-        },
-        {
-          code: "Quarterly Business Review",
-          description: "Performance assessment meeting"
-        },
-      ],
-      engagement_types: [{
-          code: "AE Email Intro",
-          description: "Account Executive introduction"
-        },
-        {
-          code: "Legal Redlines Sent",
-          description: "Contract markup delivered"
-        },
-        {
-          code: "Technical Deep Dive",
-          description: "Product architecture review"
-        },
-        {
-          code: "Security Review",
-          description: "Compliance assessment meeting"
-        },
-        {
-          code: "Pricing Discussion",
-          description: "Commercial terms negotiation"
-        },
-        {
-          code: "Reference Call",
-          description: "Customer testimonial session"
-        },
-        {
-          code: "POC Kickoff",
-          description: "Proof of concept initiation"
-        },
-        {
-          code: "Executive Briefing",
-          description: "C-level strategic discussion"
-        },
-        {
-          code: "Product Roadmap Review",
-          description: "Future development planning"
-        },
-        {
-          code: "Implementation Planning",
-          description: "Deployment strategy session"
-        },
-      ],
-      roles_tags: [{
-          code: "Champion Identified",
-          description: "Internal advocate confirmed"
-        },
-        {
-          code: "Former Customer",
-          description: "Previous client relationship"
-        },
-        {
-          code: "Decision Maker",
-          description: "Final approval authority"
-        },
-        {
-          code: "Technical Evaluator",
-          description: "Product assessment lead"
-        },
-        {
-          code: "Budget Holder",
-          description: "Financial approval authority"
-        },
-        {
-          code: "Influencer",
-          description: "Opinion leader in organization"
-        },
-        {
-          code: "End User",
-          description: "Product usage stakeholder"
-        },
-        {
-          code: "Procurement Lead",
-          description: "Vendor management contact"
-        },
-        {
-          code: "Executive Sponsor",
-          description: "Senior leadership support"
-        },
-        {
-          code: "Project Manager",
-          description: "Implementation coordinator"
-        },
-      ],
-    };
-
-    class KnowledgeGraphAnimation {
-      constructor(container) {
-        this.container = container;
-        this.svg = document.getElementById("svg");
-        this.points = [];
-        this.connections = [];
-        this.showConnections = false;
-        this.animationReady = false;
-        this.combinationDistance = 25;
-        this.startTime = Date.now();
-        this.width = 0;
-        this.height = 0;
-        this.usedCodes = new Set(); // Track used codes to ensure uniqueness
-        this.connectionRewireInterval = null;
-
-        // Constants
-        this.numPoints = 48;
-        this.maxSpeed = 0.7;
-        this.minSpeed = 0.2;
-        this.pointRadius = 4;
-        this.pointRadiusVariation = 0.3;
-        this.maxConnectionCreateDistance = 180;
-        this.maxConnectionBreakDistance = 210;
-        this.initialCombinationDistance = 25;
-        this.maxCombinationDistance = 80;
-        this.combinationDistanceIncreaseRate = 0.01;
-        this.numPointsToTransform = 15;
-        this.connectionLifespan = 30000; // Keep connections for 30 seconds
-        this.connectionRewireRate = 1500; // Rewire connections every 1.5 seconds
-        this.connectionRewirePercentage = 0.15; // Percentage of connections to rewire each time
-
-        this.init();
-      }
-
-      init() {
-        // Set initial size
-        this.updateSize();
-
-        // Initialize points
-        this.initializePoints();
-
-        // Create SVG elements
-        this.setupSVG();
-
-        // Start animation
-        this.animationReady = true;
-        this.animate();
-
-        // Start showing connections automatically on load
-        setTimeout(() => {
-          this.showConnections = true;
-
-          // Calculate initial connections
-          this.connections = this.calculateConnections();
-          this.createConnectionLines();
-
-          // Transform points after connections are created
-          setTimeout(() => {
-            this.transformConnectedPoints();
-          }, 800);
-        }, 1000); // Start after 1 second to allow initial setup
-
-        // Set up event listeners
-        window.addEventListener("resize", () => this.handleResize());
-
-        // Keep the click handler for toggling connections on/off
-        this.container.addEventListener("click", () => this.handleClick());
-      }
-
-      updateSize() {
-        this.width = this.container.clientWidth;
-        this.height = this.container.clientHeight;
-        this.svg.setAttribute("width", this.width.toString());
-        this.svg.setAttribute("height", this.height.toString());
-      }
-
-      getRandomPointValue() {
-        try {
-          // Define all possible content types for Upside attribution
-          const contentTypes = ["people", "signals", "events", "engagement_types", "roles_tags"];
-
-          // Select a content type with equal probabilities
-          const typeRoll = Math.random();
-          let selectedType;
-
-          if (typeRoll < 0.2) {
-            selectedType = "people";
-          } else if (typeRoll < 0.4) {
-            selectedType = "signals";
-          } else if (typeRoll < 0.6) {
-            selectedType = "events";
-          } else if (typeRoll < 0.8) {
-            selectedType = "engagement_types";
-          } else {
-            selectedType = "roles_tags";
-          }
-
-          const dataList = codes[selectedType];
-
-          // Make sure we have a valid data list
-          if (!dataList || !Array.isArray(dataList) || dataList.length === 0) {
-            console.error(`Invalid or empty data list for ${selectedType}`);
-            return {
-              code: "Unknown",
-              codeType: selectedType,
-              isCode: false,
-            };
-          }
-
-          // Try to find an unused code
-          let attempts = 0;
-          let selectedItem;
-          let selectedCode;
-
-          while (attempts < 20) {
-            // Limit attempts to prevent infinite loop
-            const selectedIndex = Math.floor(Math.random() * dataList.length);
-            selectedItem = dataList[selectedIndex];
-
-            if (selectedItem && typeof selectedItem === "object" && selectedItem.code) {
-              selectedCode = selectedItem.code;
-
-              // If this code hasn't been used yet, use it
-              if (!this.usedCodes.has(selectedCode)) {
-                this.usedCodes.add(selectedCode);
-                break;
-              }
-            }
-
-            attempts++;
-          }
-
-          // If we couldn't find an unused code after multiple attempts, generate a unique one
-          if (attempts >= 20 || !selectedItem || !selectedCode) {
-            const uniqueCode = this.generateUniqueCode(selectedType);
-            return {
-              code: uniqueCode,
-              description: `Generated ${selectedType} item`,
-              codeType: selectedType,
-              isCode: false,
-            };
-          }
-
-          return {
-            code: selectedItem.code,
-            description: selectedItem.description,
-            codeType: selectedType,
-            isCode: false,
-          };
-        } catch (error) {
-          console.error("Error selecting random point value:", error);
-          return {
-            code: "ERROR",
-            codeType: "people",
-            isCode: false,
-          };
-        }
-      }
-
-      // Generate a unique code when we run out of predefined ones
-      generateUniqueCode(type) {
-        const prefix = "";
-        const uniqueId = Math.floor(Math.random() * 10000);
-
-        switch (type) {
-          case "people":
-            const firstNames = ["John", "Jane", "Alex", "Sam", "Taylor", "Jordan", "Casey", "Morgan"];
-            const lastNames = ["Smith", "Jones", "Garcia", "Lee", "Brown", "Davis", "Wilson", "Moore"];
-            const titles = ["Director", "VP", "Manager", "Lead", "Head", "Specialist", "Analyst", "Consultant"];
-            const depts = ["Marketing", "Sales", "Product", "Engineering", "Finance", "Operations", "Support", "Strategy"];
-
-            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-            const title = titles[Math.floor(Math.random() * titles.length)];
-            const dept = depts[Math.floor(Math.random() * depts.length)];
-
-            return `${title} of ${dept}, ${firstName} ${lastName.charAt(0)}.`;
-
-          case "signals":
-            const signalActions = ["Viewed", "Downloaded", "Requested", "Engaged with", "Accessed", "Completed", "Shared"];
-            const signalObjects = ["Report", "Guide", "Tutorial", "Resource", "Tool", "Assessment", "Content", "Material"];
-
-            const action = signalActions[Math.floor(Math.random() * signalActions.length)];
-            const object = signalObjects[Math.floor(Math.random() * signalObjects.length)];
-
-            return `${action} ${object} ${uniqueId}`;
-
-          case "events":
-            const eventTypes = ["Workshop", "Seminar", "Meeting", "Session", "Conference", "Training", "Gathering", "Forum"];
-            const eventTopics = ["Strategy", "Innovation", "Planning", "Review", "Analysis", "Development", "Collaboration"];
-
-            const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
-            const eventTopic = eventTopics[Math.floor(Math.random() * eventTopics.length)];
-
-            return `${eventTopic} ${eventType} ${uniqueId}`;
-
-          case "engagement_types":
-            const engagementTypes = ["Call", "Meeting", "Discussion", "Review", "Analysis", "Presentation", "Consultation"];
-            const engagementTopics = [
-              "Product",
-              "Service",
-              "Solution",
-              "Strategy",
-              "Implementation",
-              "Integration",
-              "Support",
-            ];
-
-            const engType = engagementTypes[Math.floor(Math.random() * engagementTypes.length)];
-            const engTopic = engagementTopics[Math.floor(Math.random() * engagementTopics.length)];
-
-            return `${engTopic} ${engType} ${uniqueId}`;
-
-          case "roles_tags":
-            const roleAdjectives = [
-              "Primary",
-              "Secondary",
-              "Key",
-              "Critical",
-              "Essential",
-              "Strategic",
-              "Technical",
-              "Business",
-            ];
-            const roleTypes = ["Contact", "Stakeholder", "Representative", "Liaison", "Coordinator", "Specialist", "Expert"];
-
-            const roleAdj = roleAdjectives[Math.floor(Math.random() * roleAdjectives.length)];
-            const roleType = roleTypes[Math.floor(Math.random() * roleTypes.length)];
-
-            return `${roleAdj} ${roleType} ${uniqueId}`;
-
-          default:
-            return `Unknown Type ${uniqueId}`;
-        }
-      }
-
-      initializePoints() {
-        this.points = [];
-        this.usedCodes = new Set(); // Reset used codes
-
-        for (let i = 0; i < this.numPoints; i++) {
-          const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
-          const angle = Math.random() * 2 * Math.PI;
-          const vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-          const vy = Math.sin(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-          const radiusVariation = 1 + (Math.random() * 2 - 1) * this.pointRadiusVariation;
-          const radius = this.pointRadius * radiusVariation;
-
-          this.points.push({
-            id: i,
-            x: Math.random() * this.width,
-            y: Math.random() * this.height,
-            vx,
-            vy,
-            originalVx: vx,
-            originalVy: vy,
-            radius,
-            transformed: false,
-            expanded: false,
-            removed: false,
-          });
-        }
-      }
-
-      setupSVG() {
-        // Clear existing elements
-        while (this.svg.firstChild) {
-          this.svg.removeChild(this.svg.firstChild);
-        }
-
-        // Create layers
-        const linesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        linesGroup.setAttribute("id", "lines-layer");
-
-        const pointsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        pointsGroup.setAttribute("id", "points-layer");
-
-        const effectsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        effectsGroup.setAttribute("id", "effects-layer");
-
-        this.svg.appendChild(linesGroup);
-        this.svg.appendChild(effectsGroup);
-        this.svg.appendChild(pointsGroup);
-
-        // Create points as groups containing rounded rects and hidden text
-        this.points
-          .filter((point) => !point.removed)
-          .forEach((point) => {
-            // Assign a code to each point if not already assigned or if it's empty
-            if (!point.code || !point.codeType || point.code.trim() === "") {
-              const pointValue = this.getRandomPointValue();
-              point.code = pointValue.code;
-              point.codeType = pointValue.codeType;
-              point.isCode = pointValue.isCode; // Track if this is a actual code or other content
-              point.description = pointValue.description;
-            }
-
-            // Double check that we have a valid code after assignment
-            if (!point.code || point.code.trim() === "") {
-              console.warn(`Point ${point.id} still has an empty code after assignment, using fallback`);
-              const fallbackCode = this.generateUniqueCode(point.codeType || "people");
-              point.code = fallbackCode;
-            }
-
-            // Create a group for the point
-            const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            group.setAttribute("id", `point-${point.id}`);
-            group.setAttribute("transform", `translate(${point.x}, ${point.y})`);
-
-            // Create the rect element - initially small and circle-like
-            const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("id", `rect-${point.id}`);
-            rect.setAttribute("x", `-${point.radius}`);
-            rect.setAttribute("y", `-${point.radius}`);
-            rect.setAttribute("width", `${point.radius * 2}`);
-            rect.setAttribute("height", `${point.radius * 2}`);
-            rect.setAttribute("rx", `${point.radius}`); // Fully rounded to look like a circle
-            rect.setAttribute("ry", `${point.radius}`);
-            rect.setAttribute("fill", COLORS.WHITE);
-
-            let strokeColor;
-            if (point.codeType === "people") {
-              strokeColor = COLORS.PEOPLE;
-            } else if (point.codeType === "signals") {
-              strokeColor = COLORS.SIGNALS;
-            } else if (point.codeType === "events") {
-              strokeColor = COLORS.EVENTS;
-            } else if (point.codeType === "engagement_types") {
-              strokeColor = COLORS.ENGAGEMENT;
-            } else if (point.codeType === "roles_tags") {
-              strokeColor = COLORS.ROLES;
-            } else {
-              strokeColor = COLORS.FALLBACK;
-            }
-            rect.setAttribute("stroke", strokeColor);
-            rect.setAttribute("stroke-width", "1.5");
-
-            // Create text element (initially invisible)
-            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("id", `text-${point.id}`);
-            text.setAttribute("x", "0");
-            text.setAttribute("y", "0");
-            text.setAttribute("text-anchor", "middle");
-            text.setAttribute("dominant-baseline", "middle");
-            text.setAttribute("font-size", "10");
-            text.setAttribute("font-family", "Inter, sans-serif");
-            text.setAttribute("font-weight", "500"); // Medium weight for better readability
-
-            // Set text color based on content type
-            let textColor;
-            if (point.codeType === "people") {
-              textColor = COLORS.PEOPLE_DARK;
-            } else if (point.codeType === "signals") {
-              textColor = COLORS.SIGNALS_DARK;
-            } else if (point.codeType === "events") {
-              textColor = COLORS.EVENTS_DARK;
-            } else if (point.codeType === "engagement_types") {
-              textColor = COLORS.ENGAGEMENT_DARK;
-            } else if (point.codeType === "roles_tags") {
-              textColor = COLORS.ROLES_DARK;
-            } else {
-              textColor = COLORS.FALLBACK_DARK;
-            }
-            text.setAttribute("fill", textColor);
-
-            text.setAttribute("opacity", "0"); // Hidden initially
-            text.textContent = point.code;
-
-            // Add elements to the group
-            group.appendChild(rect);
-            group.appendChild(text);
-
-            // Add the group to the points layer (not directly to SVG)
-            pointsGroup.appendChild(group);
-          });
-      }
-
-      animate() {
-        if (!this.animationReady) return;
-
-        // Update combination distance
-        const elapsedTimeInSeconds = (Date.now() - this.startTime) / 1000;
-        this.combinationDistance = Math.min(
-          this.initialCombinationDistance + elapsedTimeInSeconds * this.combinationDistanceIncreaseRate,
-          this.maxCombinationDistance,
-        );
-
-        // Update point positions and check for combinations
-        this.updatePointPositions();
-        this.checkForCombinations();
-
-        // Update connections if they're visible
-        if (this.showConnections) {
-          this.updateConnections();
-        }
-
-        // Continue animation
-        requestAnimationFrame(() => this.animate());
-      }
-
-      updatePointPositions() {
-        // Only update non-removed points
-        this.points
-          .filter((point) => !point.removed)
-          .forEach((point) => {
-            // Center force
-            const centerForceStrength = 0.000001;
-            const centerX = this.width / 2;
-            const centerY = this.height / 2;
-            const dx = centerX - point.x;
-            const dy = centerY - point.y;
-            point.vx += dx * centerForceStrength;
-            point.vy += dy * centerForceStrength;
-
-            // Random force
-            const randomForceStrength = 0.000001;
-            const randomAngle = Math.random() * Math.PI * 2;
-            point.vx += Math.cos(randomAngle) * randomForceStrength;
-            point.vy += Math.sin(randomAngle) * randomForceStrength;
-
-            // Update position
-            point.x += point.vx;
-            point.y += point.vy;
-
-            // Bounce off walls
-            if (point.x < 0 || point.x > this.width) point.vx *= -1;
-            if (point.y < 0 || point.y > this.height) point.vy *= -1;
-
-            // Keep within bounds
-            point.x = Math.max(0, Math.min(this.width, point.x));
-            point.y = Math.max(0, Math.min(this.height, point.y));
-
-            // Update SVG position
-            const pointGroup = document.getElementById(`point-${point.id}`);
-            if (pointGroup) {
-              pointGroup.setAttribute("transform", `translate(${point.x}, ${point.y})`);
-            }
-          });
-      }
-
-      updateConnections() {
-        if (!this.showConnections) return;
-
-        // Calculate new connections
-        const updatedConnections = this.calculateConnections();
-
-        // Get the lines layer
-        const linesLayer = document.getElementById("lines-layer");
-        if (!linesLayer) return;
-
-        // Update existing lines
-        updatedConnections.forEach((conn) => {
-          const line = document.getElementById(`conn-${conn.id}`);
-          if (line) {
-            // Update line positions
-            line.setAttribute("x1", conn.x1.toString());
-            line.setAttribute("y1", conn.y1.toString());
-            line.setAttribute("x2", conn.x2.toString());
-            line.setAttribute("y2", conn.y2.toString());
-          } else {
-            // Create new line if it doesn't exist
-            const newLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            newLine.setAttribute("id", `conn-${conn.id}`);
-            newLine.setAttribute("x1", conn.x1.toString());
-            newLine.setAttribute("y1", conn.y1.toString());
-            newLine.setAttribute("x2", conn.x2.toString());
-            newLine.setAttribute("y2", conn.y2.toString());
-            newLine.setAttribute("stroke", COLORS.CONNECTION);
-            newLine.setAttribute("stroke-width", "1.5");
-            newLine.setAttribute("opacity", "1");
-            linesLayer.appendChild(newLine);
-          }
-        });
-
-        // Remove lines that are no longer needed
-        const currentConnectionIds = new Set(updatedConnections.map((conn) => conn.id));
-        const allLines = document.querySelectorAll('line[id^="conn-"]');
-        allLines.forEach((line) => {
-          const connId = line.id.replace("conn-", "");
-          if (!currentConnectionIds.has(connId)) {
-            anime({
-              targets: line,
-              opacity: 0,
-              duration: 300,
-              easing: "easeOutQuad",
-              complete: () => {
-                if (line.parentNode) {
-                  line.parentNode.removeChild(line);
-                }
-              },
-            });
-          }
-        });
-
-        // Update the connections array
-        this.connections = updatedConnections;
-      }
-
-      handleResize() {
-        // Pause animation
-        this.animationReady = false;
-
-        // Stop connection rewiring
-        if (this.connectionRewireInterval) {
-          clearInterval(this.connectionRewireInterval);
-          this.connectionRewireInterval = null;
-        }
-
-        // Clear all connections
-        const linesLayer = document.getElementById("lines-layer");
-        if (linesLayer) {
-          while (linesLayer.firstChild) {
-            linesLayer.removeChild(linesLayer.firstChild);
-          }
-        }
-
-        // Reset connections array
-        this.connections = [];
-
-        // Update size
-        this.updateSize();
-
-        // Re-initialize points and SVG
-        this.initializePoints();
-        this.setupSVG();
-
-        // Reset state
-        this.showConnections = false;
-        this.startTime = Date.now();
-        this.combinationDistance = this.initialCombinationDistance;
-
-        // Restart animation
-        this.animationReady = true;
-      }
-
-      handleClick() {
-        // Toggle connections visibility
-        this.showConnections = !this.showConnections;
-
-        if (this.showConnections) {
-          // Calculate connections and create lines
-          this.connections = this.calculateConnections();
-          this.createConnectionLines();
-
-          // Show points info after connections appear
-          setTimeout(() => {
-            this.transformConnectedPoints();
-          }, 600);
-        } else {
-          // Hide and remove all connections
-          const connectionLines = document.querySelectorAll('line[id^="conn-"]');
-          anime({
-            targets: connectionLines,
-            opacity: 0,
-            duration: 300,
-            easing: "easeOutQuad",
-            complete: () => {
-              // Remove connection lines
-              connectionLines.forEach((line) => {
-                if (line && line.parentNode) {
-                  line.parentNode.removeChild(line);
-                }
-              });
-
-              // Shrink expanded points
-              const expandedPoints = this.points.filter((p) => p.expanded && !p.removed);
-              expandedPoints.forEach((point) => {
-                this.shrinkPointAndHideText(point.id);
-              });
-
-              // Clear connections array
-              this.connections = [];
-            },
-          });
-        }
-      }
-
-      transformConnectedPoints() {
-        // Get all active connections
-        const activeConnections = this.connections.filter((conn) => conn.active);
-
-        // Get unique point IDs involved in connections
-        const connectedPointIds = new Set();
-        activeConnections.forEach((conn) => {
-          connectedPointIds.add(conn.sourceId);
-          connectedPointIds.add(conn.targetId);
-        });
-
-        // Filter to get only points that are part of connections and not currently expanded
-        const pointsToExpand = this.points.filter((p) => connectedPointIds.has(p.id) && !p.expanded && !p.removed);
-
-        if (pointsToExpand.length === 0) {
-          return;
-        }
-
-        // Increase the number of points to transform - show more expanded nodes
-        const numPointsToTransform = Math.min(15, pointsToExpand.length);
-        const pointsToTransform = pointsToExpand.slice(0, numPointsToTransform);
-
-        // Transform each connected point with a staggered delay
-        pointsToTransform.forEach((point, index) => {
-          setTimeout(() => {
-            this.expandPointAndShowText(point.id);
-          }, index * 50); // Increased delay between expansions to match example
-        });
-      }
-
-      expandPointAndShowText(pointId) {
-        // Find the point element
-        const pointGroup = document.getElementById(`point-${pointId}`);
-        if (!pointGroup) return;
-
-        // Get point data
-        const point = this.points.find((p) => p.id === pointId);
-        if (!point) return;
-
-        // Find rect and text elements
-        const rect = document.getElementById(`rect-${pointId}`);
-        const text = document.getElementById(`text-${pointId}`);
-
-        if (!rect || !text) return;
-
-        // Mark point as transformed
-        point.transformed = true;
-        point.expanded = true;
-
-        // Store the original text for character-by-character animation
-        const originalText = point.code?.trim() || "";
-
-        // If we still have an empty code, assign a fallback
-        if (originalText === "") {
-          const fallbackCode = this.generateUniqueCode(point.codeType || "people");
-          console.warn(`Empty code found when expanding point ${pointId}, using fallback ${fallbackCode}`);
-          point.code = fallbackCode;
-        }
-
-        // Clear the text content initially
-        text.textContent = "";
-
-        // IMPORTANT: Explicitly set opacity to 1 - this ensures text will be visible when re-expanded
-        text.setAttribute("opacity", "1");
-
-        // Calculate dimensions based on text content length and type
-        let rectWidth, rectHeight;
-        const textLength = originalText.length;
-
-        // Calculate dimensions for pill-shaped bubbles
-        rectHeight = 24; // Fixed height for all types (matching example)
-
-        if (point.codeType === "people" || point.codeType === "roles_tags") {
-          // For people and roles (typically shorter)
-          rectWidth = Math.max(60, textLength * 6); // At least 60px wide (matching example)
-        } else {
-          // For signals, events, and engagement types (potentially longer)
-          rectWidth = Math.max(140, Math.min(300, textLength * 8)); // Between 140-300px (matching example)
-        }
-
-        // Animate the rectangle - make it fully rounded (circular)
-        anime({
-          targets: rect,
-          x: -rectWidth / 2,
-          y: -rectHeight / 2,
-          width: rectWidth,
-          height: rectHeight,
-          rx: rectHeight / 2, // Make fully rounded (half of height)
-          ry: rectHeight / 2, // Make fully rounded (half of height)
-          scale: {
-            value: [0.95, 1],
-            duration: 600,
-          },
-          duration: 600,
-          easing: "easeOutElastic(1, .5)",
-        });
-
-        // Add characters one by one with staggered delay
-        const typingDuration = Math.min(900, originalText.length * 70);
-        const charDelay = typingDuration / originalText.length;
-
-        // Start typing after rectangle starts expanding
-        setTimeout(() => {
-          let currentIndex = 0;
-          const typingInterval = setInterval(() => {
-            // Add the next character
-            text.textContent = originalText.substring(0, currentIndex + 1);
-            currentIndex++;
-
-            // Stop when all characters are added
-            if (currentIndex >= originalText.length) {
-              clearInterval(typingInterval);
-              text.setAttribute("opacity", "1");
-            }
-          }, charDelay);
-        }, 250);
-
-        // Apply a scale animation to the whole text element
-        anime({
-          targets: text,
-          scale: [0.8, 1],
-          opacity: [0, 1],
-          duration: 300,
-          delay: 200,
-          easing: "easeOutQuad",
-          complete: () => {
-            text.setAttribute("opacity", "1");
-          },
-        });
-      }
-
-      shrinkPointAndHideText(pointId) {
-        // Find the point element
-        const pointGroup = document.getElementById(`point-${pointId}`);
-        if (!pointGroup) return;
-
-        // Get point data
-        const point = this.points.find((p) => p.id === pointId);
-        if (!point) return;
-
-        // Find rect and text elements
-        const rect = document.getElementById(`rect-${pointId}`);
-        const text = document.getElementById(`text-${pointId}`);
-
-        if (!rect || !text) return;
-
-        // Only mark point as not expanded, but keep transformed=true
-        point.expanded = false;
-
-        // First hide the text
-        anime({
-          targets: text,
-          opacity: [1, 0],
-          scale: [1, 0.8],
-          duration: 200,
-          easing: "easeInQuad",
-          complete: () => {
-            text.setAttribute("opacity", "0");
-          },
-        });
-
-        // Then shrink the rectangle
-        anime({
-          targets: rect,
-          x: `-${point.radius}`,
-          y: `-${point.radius}`,
-          width: point.radius * 2,
-          height: point.radius * 2,
-          rx: point.radius,
-          ry: point.radius,
-          scale: [1, 0.95],
-          duration: 600,
-          delay: 150,
-          easing: "easeInOutQuad",
-        });
-      }
-
-      checkForCombinations() {
-        const points = this.points.filter((p) => !p.removed);
-        let combinedPoints = false;
-
-        // Check all pairs of points
-        for (let i = 0; i < points.length; i++) {
-          const p1 = points[i];
-          if (p1.removed) continue;
-
-          for (let j = 0; j < points.length; j++) {
-            if (i === j) continue;
-
-            const p2 = points[j];
-            if (p2.removed) continue;
-
-            // Don't combine two expanded points
-            if (p1.expanded && p2.expanded) continue;
-
-            // Calculate distance
-            const dx = p1.x - p2.x;
-            const dy = p1.y - p2.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            // If distance is less than combination threshold, combine points
-            if (distance <= this.combinationDistance) {
-              const combined = this.combinePoints(p1.id, p2.id);
-              if (combined) {
-                combinedPoints = true;
-                break;
-              }
-            }
-          }
-
-          if (combinedPoints) break;
-        }
-
-        return combinedPoints;
-      }
-
-      combinePoints(sourceId, targetId) {
-        const sourcePoint = this.points.find((p) => p.id === sourceId && !p.removed);
-        const targetPoint = this.points.find((p) => p.id === targetId && !p.removed);
-
-        if (!sourcePoint || !targetPoint) return false;
-
-        // If both points are expanded, don't combine them
-        if (sourcePoint.expanded && targetPoint.expanded) return false;
-
-        // Choose which point to keep with updated priority:
-        // 1. Prefer code types (cpt, icd10) over non-code types (step, note)
-        // 2. Prefer reasoning steps (step) over medical notes (note)
-        // 3. If one point is expanded, keep that one
-        // 4. Otherwise, prefer the one with lower ID
-        let keepPoint, removePoint;
-
-        // Define helper functions to check point types
-        const isPerson = (point) => point.codeType === "people";
-        const isSignal = (point) => point.codeType === "signals";
-        const isEvent = (point) => point.codeType === "events";
-        const isEngagement = (point) => point.codeType === "engagement_types";
-        const isRole = (point) => point.codeType === "roles_tags";
-
-        // Apply prioritization rules - prefer people > signals > events > engagement > roles
-        if (isPerson(sourcePoint) && !isPerson(targetPoint)) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (isPerson(targetPoint) && !isPerson(sourcePoint)) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else if (isSignal(sourcePoint) && !isSignal(targetPoint) && !isPerson(targetPoint)) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (isSignal(targetPoint) && !isSignal(sourcePoint) && !isPerson(sourcePoint)) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else if (isEvent(sourcePoint) && !isEvent(targetPoint) && !isPerson(targetPoint) && !isSignal(targetPoint)) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (isEvent(targetPoint) && !isEvent(sourcePoint) && !isPerson(sourcePoint) && !isSignal(sourcePoint)) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else if (
-          isEngagement(sourcePoint) &&
-          !isEngagement(targetPoint) &&
-          !isPerson(targetPoint) &&
-          !isSignal(targetPoint) &&
-          !isEvent(targetPoint)
-        ) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (
-          isEngagement(targetPoint) &&
-          !isEngagement(sourcePoint) &&
-          !isPerson(sourcePoint) &&
-          !isSignal(sourcePoint) &&
-          !isEvent(sourcePoint)
-        ) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else if (
-          isRole(sourcePoint) &&
-          !isRole(targetPoint) &&
-          !isPerson(targetPoint) &&
-          !isSignal(targetPoint) &&
-          !isEvent(targetPoint) &&
-          !isEngagement(targetPoint)
-        ) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (
-          isRole(targetPoint) &&
-          !isRole(sourcePoint) &&
-          !isPerson(sourcePoint) &&
-          !isSignal(sourcePoint) &&
-          !isEvent(sourcePoint) &&
-          !isEngagement(sourcePoint)
-        ) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else if (sourcePoint.expanded) {
-          keepPoint = sourcePoint;
-          removePoint = targetPoint;
-        } else if (targetPoint.expanded) {
-          keepPoint = targetPoint;
-          removePoint = sourcePoint;
-        } else {
-          keepPoint = sourceId < targetId ? sourcePoint : targetPoint;
-          removePoint = sourceId < targetId ? targetPoint : sourcePoint;
-        }
-
-        const removeId = removePoint.id;
-
-        // Find and remove all connections involving the removed point
-        this.removeConnectionsForPoint(removeId);
-
-        // Track combined points
-        if (!keepPoint.combinedWith) keepPoint.combinedWith = [];
-        if (removePoint.combinedWith) {
-          // Add all points the removed point had combined with
-          keepPoint.combinedWith.push(...removePoint.combinedWith);
-        }
-        keepPoint.combinedWith.push(removeId);
-
-        // Mark the second point as removed
-        removePoint.removed = true;
-
-        // Animate the merging
-        const keepGroup = document.getElementById(`point-${keepPoint.id}`);
-        const removeGroup = document.getElementById(`point-${removeId}`);
-
-        if (keepGroup && removeGroup) {
-          // Create a ripple effect at the kept point's position
-          let rippleColor;
-          if (keepPoint.codeType === "people") {
-            rippleColor = COLORS.PEOPLE;
-          } else if (keepPoint.codeType === "signals") {
-            rippleColor = COLORS.SIGNALS;
-          } else if (keepPoint.codeType === "events") {
-            rippleColor = COLORS.EVENTS;
-          } else if (keepPoint.codeType === "engagement_types") {
-            rippleColor = COLORS.ENGAGEMENT;
-          } else if (keepPoint.codeType === "roles_tags") {
-            rippleColor = COLORS.ROLES;
-          } else {
-            rippleColor = COLORS.FALLBACK;
-          }
-
-          this.createAbsorptionRipple(keepPoint.x, keepPoint.y, rippleColor);
-
-          // Animate the removed point moving toward the kept point
-          anime({
-            targets: removeGroup,
-            translateX: [removePoint.x, keepPoint.x],
-            translateY: [removePoint.y, keepPoint.y],
-            scale: [1, 0.5],
-            opacity: [1, 0],
-            duration: 300,
-            easing: "easeOutQuad",
-            complete: () => {
-              // Remove the element from the DOM
-              if (removeGroup.parentNode) {
-                removeGroup.parentNode.removeChild(removeGroup);
-              }
-            },
-          });
-
-          // If the point is expanded, update the text box while maintaining expanded appearance
-          if (keepPoint.expanded) {
-            // Get the text element
-            const text = document.getElementById(`text-${keepPoint.id}`);
-
-            // Pulse the text to indicate absorption while keeping it visible
-            if (text) {
-              anime({
-                targets: text,
-                scale: [1, 1.1, 1],
-                duration: 400,
-                easing: "easeOutQuad",
-              });
-            }
-
-            // Update the rectangle but maintain expanded appearance
-            const keptRect = document.getElementById(`rect-${keepPoint.id}`);
-            if (keptRect) {
-              anime({
-                targets: keptRect,
-                scale: [1, 1.1, 1], // Slight pulse effect
-                duration: 600,
-                easing: "easeOutElastic(1, .5)",
-                complete: () => {
-                  this.updatePointAppearance(keepPoint.id);
-                }
-              });
-            } else {
-              this.updatePointAppearance(keepPoint.id);
-            }
-          } else {
-            // Normal non-expanded point absorption
-            const keptRect = document.getElementById(`rect-${keepPoint.id}`);
-            if (keptRect) {
-              anime({
-                targets: keptRect,
-                scale: [1, 1.1, 1], // Slight pulse effect
-                duration: 600,
-                easing: "easeOutElastic(1, .5)",
-                complete: () => {
-                  this.updatePointAppearance(keepPoint.id);
-                }
-              });
-            } else {
-              this.updatePointAppearance(keepPoint.id);
-            }
-          }
-
-          return true;
-        }
-
-        // If animation couldn't be performed, still update data
-        removePoint.removed = true;
-
-        return true;
-      }
-
-      // Method to remove connections for a specific point
-      removeConnectionsForPoint(pointId) {
-        // Find connections involving this point
-        const connectionsToRemove = this.connections.filter(
-          (conn) => conn.sourceId === pointId || conn.targetId === pointId,
-        );
-
-        // Remove each connection's SVG line from the DOM with animation
-        connectionsToRemove.forEach((conn) => {
-          const line = document.getElementById(`conn-${conn.id}`);
-          if (line) {
-            // Animate the line fading out
-            anime({
-              targets: line,
-              opacity: 0,
-              duration: 300,
-              easing: "easeOutQuad",
-              complete: () => {
-                // Remove the line from the DOM
-                if (line && line.parentNode) {
-                  line.parentNode.removeChild(line);
-                }
-              },
-            });
-          }
-        });
-
-        // Filter out the connections involving this point
-        this.connections = this.connections.filter((conn) => conn.sourceId !== pointId && conn.targetId !== pointId);
-      }
-
-      createAbsorptionRipple(x, y, color) {
-        const effectsLayer = document.getElementById("effects-layer");
-        if (!effectsLayer) return;
-
-        // Create a circle element for the ripple
-        const ripple = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        const rippleId = `ripple-${Date.now()}`;
-        ripple.setAttribute("id", rippleId);
-        ripple.setAttribute("cx", x.toString());
-        ripple.setAttribute("cy", y.toString());
-        ripple.setAttribute("r", "0");
-        ripple.setAttribute("fill", "none");
-        ripple.setAttribute("stroke", color);
-        ripple.setAttribute("stroke-width", "1.5");
-        ripple.setAttribute("opacity", "0.8");
-
-        // Add the ripple to the effects layer
-        effectsLayer.appendChild(ripple);
-
-        // Animate the ripple expanding and fading out
-        anime({
-          targets: ripple,
-          r: [0, 50],
-          opacity: [0.4, 0],
-          strokeWidth: [5, 0.5],
-          duration: 800,
-          easing: "easeOutExpo",
-          complete: () => {
-            // Remove the ripple element when animation is complete
-            if (ripple.parentNode) {
-              ripple.parentNode.removeChild(ripple);
-            }
-          },
-        });
-      }
-
-      updatePointAppearance(pointId) {
-        const point = this.points.find((p) => p.id === pointId);
-        if (!point) return;
-
-        const rect = document.getElementById(`rect-${pointId}`);
-        if (!rect) return;
-
-        // Update the stroke color
-        let strokeColor;
-        if (point.codeType === "people") {
-          strokeColor = COLORS.PEOPLE;
-        } else if (point.codeType === "signals") {
-          strokeColor = COLORS.SIGNALS;
-        } else if (point.codeType === "events") {
-          strokeColor = COLORS.EVENTS;
-        } else if (point.codeType === "engagement_types") {
-          strokeColor = COLORS.ENGAGEMENT;
-        } else if (point.codeType === "roles_tags") {
-          strokeColor = COLORS.ROLES;
-        } else {
-          strokeColor = COLORS.FALLBACK;
-        }
-        rect.setAttribute("stroke", strokeColor);
-      }
-
-      // Calculate connections between points
-      calculateConnections() {
-        // Get only valid points (not removed)
-        const validPoints = this.points.filter((p) => !p.removed);
-        const k = 2; // Number of nearest neighbors to track (reduced from 5 to 2 to match example)
-        const connections = [];
-        const currentTime = Date.now();
-
-        // Calculate distances between all points
-        for (let i = 0; i < validPoints.length; i++) {
-          const p1 = validPoints[i];
-
-          // Store distances to all other points
-          const distances = [];
-
-          for (let j = 0; j < validPoints.length; j++) {
-            if (i === j) continue;
-
-            const p2 = validPoints[j];
-            const dx = p1.x - p2.x;
-            const dy = p1.y - p2.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            // Only include points that are not too far away
-            if (distance <= this.maxConnectionCreateDistance) {
-              distances.push({
-                index: j,
-                distance
-              });
-            }
-          }
-
-          // Sort by distance and take k nearest
-          distances.sort((a, b) => a.distance - b.distance);
-
-          // Add connections (avoid duplicates by only adding if i < neighbor.index)
-          for (let n = 0; n < Math.min(k, distances.length); n++) {
-            const neighborIdx = distances[n].index;
-            if (i < neighborIdx) {
-              const p2 = validPoints[neighborIdx];
-              const connectionId = `${p1.id}-${p2.id}`;
-
-              // Create connection object with creation timestamp
-              connections.push({
-                id: connectionId,
-                x1: p1.x,
-                y1: p1.y,
-                x2: p2.x,
-                y2: p2.y,
-                sourceId: p1.id,
-                targetId: p2.id,
-                active: true,
-                createdAt: currentTime,
-              });
-            }
-          }
-        }
-
-        return connections;
-      }
-
-      // Create SVG line elements for all connections
-      createConnectionLines() {
-        if (!this.showConnections) return;
-
-        const linesLayer = document.getElementById("lines-layer");
-        if (!linesLayer) return;
-
-        // Clear existing lines first
-        while (linesLayer.firstChild) {
-          linesLayer.removeChild(linesLayer.firstChild);
-        }
-
-        // Create lines for all connections
-        this.connections.forEach((conn) => {
-          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-          line.setAttribute("id", `conn-${conn.id}`);
-          line.setAttribute("x1", conn.x1.toString());
-          line.setAttribute("y1", conn.y1.toString());
-          line.setAttribute("x2", conn.x2.toString());
-          line.setAttribute("y2", conn.y2.toString());
-          line.setAttribute("stroke", COLORS.CONNECTION);
-          line.setAttribute("stroke-width", "1.5");
-          line.setAttribute("opacity", "0"); // Start invisible
-
-          // Add to the lines layer
-          linesLayer.appendChild(line);
-        });
-
-        // Animate all the lines appearing
-        const connectionLines = document.querySelectorAll('line[id^="conn-"]');
-        anime({
-          targets: connectionLines,
-          opacity: [0, 1],
-          duration: 500,
-          delay: anime.stagger(50),
-          easing: "easeInOutQuad",
-        });
-      }
-    }
-
-    // Initialize the animation when the page loads
-    window.addEventListener('load', () => {
-      const container = document.getElementById('container');
-      new KnowledgeGraphAnimation(container);
-    });
-  </script>
+	<div class="container" id="container">
+		<svg id="svg"></svg>
+	</div>
+
+	<script>
+		// Color constants for Upside attribution data
+		const COLORS = {
+			PEOPLE: "#D94B50",
+			PEOPLE_DARK: "#B73E42",
+			SIGNALS: "#E6774A",
+			SIGNALS_DARK: "#D4653F",
+			EVENTS: "#835CE0",
+			EVENTS_DARK: "#7049C7",
+			ENGAGEMENT: "#347BD1",
+			ENGAGEMENT_DARK: "#2D6BB8",
+			ROLES: "#66AF48",
+			ROLES_DARK: "#5A9B3F",
+			FALLBACK: "#F1CA66",
+			FALLBACK_DARK: "#E8B955",
+			CONNECTION: "#c7cacd",
+			WHITE: "white",
+			BLACK: "black",
+		};
+
+		// Upside attribution data
+		const codes = {
+			people: [{
+					code: "Edith Harris (CEO)",
+					description: "Chief Executive Officer"
+				},
+				{
+					code: "VP Legal, Vonda H.",
+					description: "Vice President of Legal"
+				},
+				{
+					code: "Marcus Chen (CTO)",
+					description: "Chief Technology Officer"
+				},
+				{
+					code: "Sarah Kim (CFO)",
+					description: "Chief Financial Officer"
+				},
+				{
+					code: "Director IT, James R.",
+					description: "IT Director"
+				},
+				{
+					code: "Lisa Wong (CPO)",
+					description: "Chief Product Officer"
+				},
+				{
+					code: "David Miller (VP Sales)",
+					description: "Vice President of Sales"
+				},
+				{
+					code: "Head of Security, Alex T.",
+					description: "Security Lead"
+				},
+				{
+					code: "Michael Johnson (COO)",
+					description: "Chief Operating Officer"
+				},
+				{
+					code: "Emma Rodriguez (CMO)",
+					description: "Chief Marketing Officer"
+				},
+			],
+			signals: [{
+					code: "Opened Sales Deck",
+					description: "Viewed presentation materials"
+				},
+				{
+					code: "Clicked Ad",
+					description: "Engaged with advertising content"
+				},
+				{
+					code: "Shared Org Chart",
+					description: "Distributed organizational information"
+				},
+				{
+					code: "Downloaded Whitepaper",
+					description: "Accessed thought leadership content"
+				},
+				{
+					code: "Visited Pricing Page",
+					description: "Reviewed pricing information"
+				},
+				{
+					code: "Watched Demo Video",
+					description: "Consumed product demonstration"
+				},
+				{
+					code: "Joined Webinar",
+					description: "Attended online presentation"
+				},
+				{
+					code: "Requested Trial",
+					description: "Initiated product evaluation"
+				},
+				{
+					code: "Viewed Case Study",
+					description: "Examined success stories"
+				},
+				{
+					code: "Subscribed to Newsletter",
+					description: "Opted in for regular updates"
+				},
+			],
+			events: [{
+					code: "Warriors Game",
+					description: "Corporate entertainment event"
+				},
+				{
+					code: "Internal Demo Review",
+					description: "Product demonstration session"
+				},
+				{
+					code: "Executive Offsite",
+					description: "Leadership retreat meeting"
+				},
+				{
+					code: "Industry Conference",
+					description: "Professional networking event"
+				},
+				{
+					code: "Board Meeting",
+					description: "Executive governance session"
+				},
+				{
+					code: "Customer Advisory",
+					description: "Strategic feedback session"
+				},
+				{
+					code: "Partner Summit",
+					description: "Ecosystem collaboration event"
+				},
+				{
+					code: "Product Launch",
+					description: "New feature announcement"
+				},
+				{
+					code: "Annual Sales Kickoff",
+					description: "Yearly sales strategy meeting"
+				},
+				{
+					code: "Quarterly Business Review",
+					description: "Performance assessment meeting"
+				},
+			],
+			engagement_types: [{
+					code: "AE Email Intro",
+					description: "Account Executive introduction"
+				},
+				{
+					code: "Legal Redlines Sent",
+					description: "Contract markup delivered"
+				},
+				{
+					code: "Technical Deep Dive",
+					description: "Product architecture review"
+				},
+				{
+					code: "Security Review",
+					description: "Compliance assessment meeting"
+				},
+				{
+					code: "Pricing Discussion",
+					description: "Commercial terms negotiation"
+				},
+				{
+					code: "Reference Call",
+					description: "Customer testimonial session"
+				},
+				{
+					code: "POC Kickoff",
+					description: "Proof of concept initiation"
+				},
+				{
+					code: "Executive Briefing",
+					description: "C-level strategic discussion"
+				},
+				{
+					code: "Product Roadmap Review",
+					description: "Future development planning"
+				},
+				{
+					code: "Implementation Planning",
+					description: "Deployment strategy session"
+				},
+			],
+			roles_tags: [{
+					code: "Champion Identified",
+					description: "Internal advocate confirmed"
+				},
+				{
+					code: "Former Customer",
+					description: "Previous client relationship"
+				},
+				{
+					code: "Decision Maker",
+					description: "Final approval authority"
+				},
+				{
+					code: "Technical Evaluator",
+					description: "Product assessment lead"
+				},
+				{
+					code: "Budget Holder",
+					description: "Financial approval authority"
+				},
+				{
+					code: "Influencer",
+					description: "Opinion leader in organization"
+				},
+				{
+					code: "End User",
+					description: "Product usage stakeholder"
+				},
+				{
+					code: "Procurement Lead",
+					description: "Vendor management contact"
+				},
+				{
+					code: "Executive Sponsor",
+					description: "Senior leadership support"
+				},
+				{
+					code: "Project Manager",
+					description: "Implementation coordinator"
+				},
+			],
+		};
+
+		class KnowledgeGraphAnimation {
+			constructor(container) {
+				this.container = container;
+				this.svg = document.getElementById("svg");
+				this.points = [];
+				this.connections = [];
+				this.showConnections = false;
+				this.animationReady = false;
+				this.combinationDistance = 25;
+				this.startTime = Date.now();
+				this.width = 0;
+				this.height = 0;
+				this.usedCodes = new Set(); // Track used codes to ensure uniqueness
+				this.connectionRewireInterval = null;
+
+				// Constants
+				this.numPoints = 48;
+				this.maxSpeed = 0.7;
+				this.minSpeed = 0.2;
+				this.pointRadius = 4;
+				this.pointRadiusVariation = 0.3;
+				this.maxConnectionCreateDistance = 180;
+				this.maxConnectionBreakDistance = 210;
+				this.initialCombinationDistance = 25;
+				this.maxCombinationDistance = 80;
+				this.combinationDistanceIncreaseRate = 0.01;
+				this.numPointsToTransform = 15;
+				this.connectionLifespan = Infinity;
+				this.connectionRewireRate = 1500; // Rewire connections every 1.5 seconds
+				this.connectionRewirePercentage = 0.15; // Percentage of connections to rewire each time
+
+				this.init();
+			}
+
+			init() {
+				// Set initial size
+				this.updateSize();
+
+				// Initialize points
+				this.initializePoints();
+
+				// Create SVG elements
+				this.setupSVG();
+
+				// Start animation
+				this.animationReady = true;
+				this.animate();
+
+				// Start showing connections automatically on load
+				setTimeout(() => {
+					this.showConnections = true;
+
+					// Calculate initial connections
+					this.connections = this.calculateConnections();
+					this.createConnectionLines();
+
+					// Transform points after connections are created
+					setTimeout(() => {
+						this.transformConnectedPoints();
+					}, 800);
+				}, 1000); // Start after 1 second to allow initial setup
+
+				// Set up event listeners
+				window.addEventListener("resize", () => this.handleResize());
+
+				// Keep the click handler for toggling connections on/off
+				this.container.addEventListener("click", () => this.handleClick());
+			}
+
+			updateSize() {
+				this.width = this.container.clientWidth;
+				this.height = this.container.clientHeight;
+				this.svg.setAttribute("width", this.width.toString());
+				this.svg.setAttribute("height", this.height.toString());
+			}
+
+			getRandomPointValue() {
+				try {
+					// Define all possible content types for Upside attribution
+					const contentTypes = ["people", "signals", "events", "engagement_types", "roles_tags"];
+
+					// Select a content type with equal probabilities
+					const typeRoll = Math.random();
+					let selectedType;
+
+					if (typeRoll < 0.2) {
+						selectedType = "people";
+					} else if (typeRoll < 0.4) {
+						selectedType = "signals";
+					} else if (typeRoll < 0.6) {
+						selectedType = "events";
+					} else if (typeRoll < 0.8) {
+						selectedType = "engagement_types";
+					} else {
+						selectedType = "roles_tags";
+					}
+
+					const dataList = codes[selectedType];
+
+					// Make sure we have a valid data list
+					if (!dataList || !Array.isArray(dataList) || dataList.length === 0) {
+						console.error(`Invalid or empty data list for ${selectedType}`);
+						return {
+							code: "Unknown",
+							codeType: selectedType,
+							isCode: false,
+						};
+					}
+
+					// Try to find an unused code
+					let attempts = 0;
+					let selectedItem;
+					let selectedCode;
+
+					while (attempts < 20) {
+						// Limit attempts to prevent infinite loop
+						const selectedIndex = Math.floor(Math.random() * dataList.length);
+						selectedItem = dataList[selectedIndex];
+
+						if (selectedItem && typeof selectedItem === "object" && selectedItem.code) {
+							selectedCode = selectedItem.code;
+
+							// If this code hasn't been used yet, use it
+							if (!this.usedCodes.has(selectedCode)) {
+								this.usedCodes.add(selectedCode);
+								break;
+							}
+						}
+
+						attempts++;
+					}
+
+					// If we couldn't find an unused code after multiple attempts, generate a unique one
+					if (attempts >= 20 || !selectedItem || !selectedCode) {
+						const uniqueCode = this.generateUniqueCode(selectedType);
+						return {
+							code: uniqueCode,
+							description: `Generated ${selectedType} item`,
+							codeType: selectedType,
+							isCode: false,
+						};
+					}
+
+					return {
+						code: selectedItem.code,
+						description: selectedItem.description,
+						codeType: selectedType,
+						isCode: false,
+					};
+				} catch (error) {
+					console.error("Error selecting random point value:", error);
+					return {
+						code: "ERROR",
+						codeType: "people",
+						isCode: false,
+					};
+				}
+			}
+
+			// Generate a unique code when we run out of predefined ones
+			generateUniqueCode(type) {
+				const prefix = "";
+				const uniqueId = Math.floor(Math.random() * 10000);
+
+				switch (type) {
+					case "people":
+						const firstNames = ["John", "Jane", "Alex", "Sam", "Taylor", "Jordan", "Casey", "Morgan"];
+						const lastNames = ["Smith", "Jones", "Garcia", "Lee", "Brown", "Davis", "Wilson", "Moore"];
+						const titles = ["Director", "VP", "Manager", "Lead", "Head", "Specialist", "Analyst", "Consultant"];
+						const depts = ["Marketing", "Sales", "Product", "Engineering", "Finance", "Operations", "Support", "Strategy"];
+
+						const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+						const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+						const title = titles[Math.floor(Math.random() * titles.length)];
+						const dept = depts[Math.floor(Math.random() * depts.length)];
+
+						return `${title} of ${dept}, ${firstName} ${lastName.charAt(0)}.`;
+
+					case "signals":
+						const signalActions = ["Viewed", "Downloaded", "Requested", "Engaged with", "Accessed", "Completed", "Shared"];
+						const signalObjects = ["Report", "Guide", "Tutorial", "Resource", "Tool", "Assessment", "Content", "Material"];
+
+						const action = signalActions[Math.floor(Math.random() * signalActions.length)];
+						const object = signalObjects[Math.floor(Math.random() * signalObjects.length)];
+
+						return `${action} ${object} ${uniqueId}`;
+
+					case "events":
+						const eventTypes = ["Workshop", "Seminar", "Meeting", "Session", "Conference", "Training", "Gathering", "Forum"];
+						const eventTopics = ["Strategy", "Innovation", "Planning", "Review", "Analysis", "Development", "Collaboration"];
+
+						const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+						const eventTopic = eventTopics[Math.floor(Math.random() * eventTopics.length)];
+
+						return `${eventTopic} ${eventType} ${uniqueId}`;
+
+					case "engagement_types":
+						const engagementTypes = ["Call", "Meeting", "Discussion", "Review", "Analysis", "Presentation", "Consultation"];
+						const engagementTopics = [
+							"Product",
+							"Service",
+							"Solution",
+							"Strategy",
+							"Implementation",
+							"Integration",
+							"Support",
+						];
+
+						const engType = engagementTypes[Math.floor(Math.random() * engagementTypes.length)];
+						const engTopic = engagementTopics[Math.floor(Math.random() * engagementTopics.length)];
+
+						return `${engTopic} ${engType} ${uniqueId}`;
+
+					case "roles_tags":
+						const roleAdjectives = [
+							"Primary",
+							"Secondary",
+							"Key",
+							"Critical",
+							"Essential",
+							"Strategic",
+							"Technical",
+							"Business",
+						];
+						const roleTypes = ["Contact", "Stakeholder", "Representative", "Liaison", "Coordinator", "Specialist", "Expert"];
+
+						const roleAdj = roleAdjectives[Math.floor(Math.random() * roleAdjectives.length)];
+						const roleType = roleTypes[Math.floor(Math.random() * roleTypes.length)];
+
+						return `${roleAdj} ${roleType} ${uniqueId}`;
+
+					default:
+						return `Unknown Type ${uniqueId}`;
+				}
+			}
+
+			initializePoints() {
+				this.points = [];
+				this.usedCodes = new Set(); // Reset used codes
+
+				for (let i = 0; i < this.numPoints; i++) {
+					const speed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
+					const angle = Math.random() * 2 * Math.PI;
+					const vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+					const vy = Math.sin(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+					const radiusVariation = 1 + (Math.random() * 2 - 1) * this.pointRadiusVariation;
+					const radius = this.pointRadius * radiusVariation;
+
+					this.points.push({
+						id: i,
+						x: Math.random() * this.width,
+						y: Math.random() * this.height,
+						vx,
+						vy,
+						originalVx: vx,
+						originalVy: vy,
+						radius,
+						transformed: false,
+						expanded: false,
+						removed: false,
+					});
+				}
+			}
+
+			setupSVG() {
+				// Clear existing elements
+				while (this.svg.firstChild) {
+					this.svg.removeChild(this.svg.firstChild);
+				}
+
+				// Create layers
+				const linesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+				linesGroup.setAttribute("id", "lines-layer");
+
+				const pointsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+				pointsGroup.setAttribute("id", "points-layer");
+
+				const effectsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+				effectsGroup.setAttribute("id", "effects-layer");
+
+				this.svg.appendChild(linesGroup);
+				this.svg.appendChild(effectsGroup);
+				this.svg.appendChild(pointsGroup);
+
+				// Create points as groups containing rounded rects and hidden text
+				this.points
+					.filter((point) => !point.removed)
+					.forEach((point) => {
+						// Assign a code to each point if not already assigned or if it's empty
+						if (!point.code || !point.codeType || point.code.trim() === "") {
+							const pointValue = this.getRandomPointValue();
+							point.code = pointValue.code;
+							point.codeType = pointValue.codeType;
+							point.isCode = pointValue.isCode; // Track if this is a actual code or other content
+							point.description = pointValue.description;
+						}
+
+						// Double check that we have a valid code after assignment
+						if (!point.code || point.code.trim() === "") {
+							console.warn(`Point ${point.id} still has an empty code after assignment, using fallback`);
+							const fallbackCode = this.generateUniqueCode(point.codeType || "people");
+							point.code = fallbackCode;
+						}
+
+						// Create a group for the point
+						const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+						group.setAttribute("id", `point-${point.id}`);
+						group.setAttribute("transform", `translate(${point.x}, ${point.y})`);
+
+						// Create the rect element - initially small and circle-like
+						const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+						rect.setAttribute("id", `rect-${point.id}`);
+						rect.setAttribute("x", `-${point.radius}`);
+						rect.setAttribute("y", `-${point.radius}`);
+						rect.setAttribute("width", `${point.radius * 2}`);
+						rect.setAttribute("height", `${point.radius * 2}`);
+						rect.setAttribute("rx", `${point.radius}`); // Fully rounded to look like a circle
+						rect.setAttribute("ry", `${point.radius}`);
+						rect.setAttribute("fill", COLORS.WHITE);
+
+						let strokeColor;
+						if (point.codeType === "people") {
+							strokeColor = COLORS.PEOPLE;
+						} else if (point.codeType === "signals") {
+							strokeColor = COLORS.SIGNALS;
+						} else if (point.codeType === "events") {
+							strokeColor = COLORS.EVENTS;
+						} else if (point.codeType === "engagement_types") {
+							strokeColor = COLORS.ENGAGEMENT;
+						} else if (point.codeType === "roles_tags") {
+							strokeColor = COLORS.ROLES;
+						} else {
+							strokeColor = COLORS.FALLBACK;
+						}
+						rect.setAttribute("stroke", strokeColor);
+						rect.setAttribute("stroke-width", "1.5");
+
+						// Create text element (initially invisible)
+						const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+						text.setAttribute("id", `text-${point.id}`);
+						text.setAttribute("x", "0");
+						text.setAttribute("y", "0");
+						text.setAttribute("text-anchor", "middle");
+						text.setAttribute("dominant-baseline", "middle");
+						text.setAttribute("font-size", "10");
+						text.setAttribute("font-family", "Inter, sans-serif");
+						text.setAttribute("font-weight", "500"); // Medium weight for better readability
+
+						// Set text color based on content type
+						let textColor;
+						if (point.codeType === "people") {
+							textColor = COLORS.PEOPLE_DARK;
+						} else if (point.codeType === "signals") {
+							textColor = COLORS.SIGNALS_DARK;
+						} else if (point.codeType === "events") {
+							textColor = COLORS.EVENTS_DARK;
+						} else if (point.codeType === "engagement_types") {
+							textColor = COLORS.ENGAGEMENT_DARK;
+						} else if (point.codeType === "roles_tags") {
+							textColor = COLORS.ROLES_DARK;
+						} else {
+							textColor = COLORS.FALLBACK_DARK;
+						}
+						text.setAttribute("fill", textColor);
+
+						text.setAttribute("opacity", "0"); // Hidden initially
+						text.textContent = point.code;
+
+						// Add elements to the group
+						group.appendChild(rect);
+						group.appendChild(text);
+
+						// Add the group to the points layer (not directly to SVG)
+						pointsGroup.appendChild(group);
+					});
+			}
+
+			animate() {
+				if (!this.animationReady) return;
+
+				// Update combination distance
+				const elapsedTimeInSeconds = (Date.now() - this.startTime) / 1000;
+				this.combinationDistance = Math.min(
+					this.initialCombinationDistance + elapsedTimeInSeconds * this.combinationDistanceIncreaseRate,
+					this.maxCombinationDistance,
+				);
+
+				// Update point positions and check for combinations
+				this.updatePointPositions();
+				this.checkForCombinations();
+
+				// Update connections if they're visible
+				if (this.showConnections) {
+					this.updateConnections();
+				}
+
+				// Continue animation
+				requestAnimationFrame(() => this.animate());
+			}
+
+			updatePointPositions() {
+				// Only update non-removed points
+				this.points
+					.filter((point) => !point.removed)
+					.forEach((point) => {
+						// Center force
+						const centerForceStrength = 0.000001;
+						const centerX = this.width / 2;
+						const centerY = this.height / 2;
+						const dx = centerX - point.x;
+						const dy = centerY - point.y;
+						point.vx += dx * centerForceStrength;
+						point.vy += dy * centerForceStrength;
+
+						// Random force
+						const randomForceStrength = 0.000001;
+						const randomAngle = Math.random() * Math.PI * 2;
+						point.vx += Math.cos(randomAngle) * randomForceStrength;
+						point.vy += Math.sin(randomAngle) * randomForceStrength;
+
+						// Update position
+						point.x += point.vx;
+						point.y += point.vy;
+
+						// Bounce off walls
+						if (point.x < 0 || point.x > this.width) point.vx *= -1;
+						if (point.y < 0 || point.y > this.height) point.vy *= -1;
+
+						// Keep within bounds
+						point.x = Math.max(0, Math.min(this.width, point.x));
+						point.y = Math.max(0, Math.min(this.height, point.y));
+
+						// Update SVG position
+						const pointGroup = document.getElementById(`point-${point.id}`);
+						if (pointGroup) {
+							pointGroup.setAttribute("transform", `translate(${point.x}, ${point.y})`);
+						}
+					});
+			}
+
+			updateConnections() {
+				if (!this.showConnections) return;
+
+				// Calculate new connections
+				const updatedConnections = this.calculateConnections();
+
+				// Get the lines layer
+				const linesLayer = document.getElementById("lines-layer");
+				if (!linesLayer) return;
+
+				// Update existing lines
+				updatedConnections.forEach((conn) => {
+					const line = document.getElementById(`conn-${conn.id}`);
+					if (line) {
+						// Update line positions
+						line.setAttribute("x1", conn.x1.toString());
+						line.setAttribute("y1", conn.y1.toString());
+						line.setAttribute("x2", conn.x2.toString());
+						line.setAttribute("y2", conn.y2.toString());
+					} else {
+						// Create new line if it doesn't exist
+						const newLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+						newLine.setAttribute("id", `conn-${conn.id}`);
+						newLine.setAttribute("x1", conn.x1.toString());
+						newLine.setAttribute("y1", conn.y1.toString());
+						newLine.setAttribute("x2", conn.x2.toString());
+						newLine.setAttribute("y2", conn.y2.toString());
+						newLine.setAttribute("stroke", COLORS.CONNECTION);
+						newLine.setAttribute("stroke-width", "1.5");
+						newLine.setAttribute("opacity", "1");
+						linesLayer.appendChild(newLine);
+					}
+				});
+
+				// Remove lines that are no longer needed
+				const currentConnectionIds = new Set(updatedConnections.map((conn) => conn.id));
+				const allLines = document.querySelectorAll('line[id^="conn-"]');
+				allLines.forEach((line) => {
+					const connId = line.id.replace("conn-", "");
+					if (!currentConnectionIds.has(connId)) {
+						anime({
+							targets: line,
+							opacity: 0,
+							duration: 300,
+							easing: "easeOutQuad",
+							complete: () => {
+								if (line.parentNode) {
+									line.parentNode.removeChild(line);
+								}
+							},
+						});
+					}
+				});
+
+				// Update the connections array
+				this.connections = updatedConnections;
+			}
+
+			handleResize() {
+				// Pause animation
+				this.animationReady = false;
+
+				// Stop connection rewiring
+				if (this.connectionRewireInterval) {
+					clearInterval(this.connectionRewireInterval);
+					this.connectionRewireInterval = null;
+				}
+
+				// Clear all connections
+				const linesLayer = document.getElementById("lines-layer");
+				if (linesLayer) {
+					while (linesLayer.firstChild) {
+						linesLayer.removeChild(linesLayer.firstChild);
+					}
+				}
+
+				// Reset connections array
+				this.connections = [];
+
+				// Update size
+				this.updateSize();
+
+				// Re-initialize points and SVG
+				this.initializePoints();
+				this.setupSVG();
+
+				// Reset state
+				this.showConnections = false;
+				this.startTime = Date.now();
+				this.combinationDistance = this.initialCombinationDistance;
+
+				// Restart animation
+				this.animationReady = true;
+			}
+
+			handleClick() {
+				// Toggle connections visibility
+				this.showConnections = !this.showConnections;
+
+				if (this.showConnections) {
+					// Calculate connections and create lines
+					this.connections = this.calculateConnections();
+					this.createConnectionLines();
+
+					// Show points info after connections appear
+					setTimeout(() => {
+						this.transformConnectedPoints();
+					}, 600);
+				} else {
+					// Hide and remove all connections
+					const connectionLines = document.querySelectorAll('line[id^="conn-"]');
+					anime({
+						targets: connectionLines,
+						opacity: 0,
+						duration: 300,
+						easing: "easeOutQuad",
+						complete: () => {
+							// Remove connection lines
+							connectionLines.forEach((line) => {
+								if (line && line.parentNode) {
+									line.parentNode.removeChild(line);
+								}
+							});
+
+							// Shrink expanded points
+							const expandedPoints = this.points.filter((p) => p.expanded && !p.removed);
+							expandedPoints.forEach((point) => {
+								this.shrinkPointAndHideText(point.id);
+							});
+
+							// Clear connections array
+							this.connections = [];
+						},
+					});
+				}
+			}
+
+			transformConnectedPoints() {
+				// Get all active connections
+				const activeConnections = this.connections.filter((conn) => conn.active);
+
+				// Get unique point IDs involved in connections
+				const connectedPointIds = new Set();
+				activeConnections.forEach((conn) => {
+					connectedPointIds.add(conn.sourceId);
+					connectedPointIds.add(conn.targetId);
+				});
+
+				// Filter to get only points that are part of connections and not currently expanded
+				const pointsToExpand = this.points.filter((p) => connectedPointIds.has(p.id) && !p.expanded && !p.removed);
+
+				if (pointsToExpand.length === 0) {
+					return;
+				}
+
+				// Increase the number of points to transform - show more expanded nodes
+				const numPointsToTransform = Math.min(15, pointsToExpand.length);
+				const pointsToTransform = pointsToExpand.slice(0, numPointsToTransform);
+
+				// Transform each connected point with a staggered delay
+				pointsToTransform.forEach((point, index) => {
+					setTimeout(() => {
+						this.expandPointAndShowText(point.id);
+					}, index * 50); // Increased delay between expansions to match example
+				});
+			}
+
+			expandPointAndShowText(pointId) {
+				// Find the point element
+				const pointGroup = document.getElementById(`point-${pointId}`);
+				if (!pointGroup) return;
+
+				// Get point data
+				const point = this.points.find((p) => p.id === pointId);
+				if (!point) return;
+
+				// Find rect and text elements
+				const rect = document.getElementById(`rect-${pointId}`);
+				const text = document.getElementById(`text-${pointId}`);
+
+				if (!rect || !text) return;
+
+				// Mark point as transformed
+				point.transformed = true;
+				point.expanded = true;
+
+				// Store the original text for character-by-character animation
+				const originalText = point.code?.trim() || "";
+
+				// If we still have an empty code, assign a fallback
+				if (originalText === "") {
+					const fallbackCode = this.generateUniqueCode(point.codeType || "people");
+					console.warn(`Empty code found when expanding point ${pointId}, using fallback ${fallbackCode}`);
+					point.code = fallbackCode;
+				}
+
+				// Clear the text content initially
+				text.textContent = "";
+
+				// IMPORTANT: Explicitly set opacity to 1 - this ensures text will be visible when re-expanded
+				text.setAttribute("opacity", "1");
+
+				// Calculate dimensions based on text content length and type
+				let rectWidth, rectHeight;
+				const textLength = originalText.length;
+
+				// Calculate dimensions for pill-shaped bubbles
+				rectHeight = 24; // Fixed height for all types (matching example)
+
+				if (point.codeType === "people" || point.codeType === "roles_tags") {
+					// For people and roles (typically shorter)
+					rectWidth = Math.max(60, textLength * 6); // At least 60px wide (matching example)
+				} else {
+					// For signals, events, and engagement types (potentially longer)
+					rectWidth = Math.max(140, Math.min(300, textLength * 8)); // Between 140-300px (matching example)
+				}
+
+				// Animate the rectangle - make it fully rounded (circular)
+				anime({
+					targets: rect,
+					x: -rectWidth / 2,
+					y: -rectHeight / 2,
+					width: rectWidth,
+					height: rectHeight,
+					rx: rectHeight / 2, // Make fully rounded (half of height)
+					ry: rectHeight / 2, // Make fully rounded (half of height)
+					scale: {
+						value: [0.95, 1],
+						duration: 600,
+					},
+					duration: 600,
+					easing: "easeOutElastic(1, .5)",
+				});
+
+				// Add characters one by one with staggered delay
+				const typingDuration = Math.min(900, originalText.length * 70);
+				const charDelay = typingDuration / originalText.length;
+
+				// Start typing after rectangle starts expanding
+				setTimeout(() => {
+					let currentIndex = 0;
+					const typingInterval = setInterval(() => {
+						// Add the next character
+						text.textContent = originalText.substring(0, currentIndex + 1);
+						currentIndex++;
+
+						// Stop when all characters are added
+						if (currentIndex >= originalText.length) {
+							clearInterval(typingInterval);
+							text.setAttribute("opacity", "1");
+						}
+					}, charDelay);
+				}, 250);
+
+				// Apply a scale animation to the whole text element
+				anime({
+					targets: text,
+					scale: [0.8, 1],
+					opacity: [0, 1],
+					duration: 300,
+					delay: 200,
+					easing: "easeOutQuad",
+					complete: () => {
+						text.setAttribute("opacity", "1");
+					},
+				});
+			}
+
+			shrinkPointAndHideText(pointId) {
+				// Find the point element
+				const pointGroup = document.getElementById(`point-${pointId}`);
+				if (!pointGroup) return;
+
+				// Get point data
+				const point = this.points.find((p) => p.id === pointId);
+				if (!point) return;
+
+				// Find rect and text elements
+				const rect = document.getElementById(`rect-${pointId}`);
+				const text = document.getElementById(`text-${pointId}`);
+
+				if (!rect || !text) return;
+
+				// Only mark point as not expanded, but keep transformed=true
+				point.expanded = false;
+
+				// First hide the text
+				anime({
+					targets: text,
+					opacity: [1, 0],
+					scale: [1, 0.8],
+					duration: 200,
+					easing: "easeInQuad",
+					complete: () => {
+						text.setAttribute("opacity", "0");
+					},
+				});
+
+				// Then shrink the rectangle
+				anime({
+					targets: rect,
+					x: `-${point.radius}`,
+					y: `-${point.radius}`,
+					width: point.radius * 2,
+					height: point.radius * 2,
+					rx: point.radius,
+					ry: point.radius,
+					scale: [1, 0.95],
+					duration: 600,
+					delay: 150,
+					easing: "easeInOutQuad",
+				});
+			}
+
+			checkForCombinations() {
+				const points = this.points.filter((p) => !p.removed);
+				let combinedPoints = false;
+
+				// Check all pairs of points
+				for (let i = 0; i < points.length; i++) {
+					const p1 = points[i];
+					if (p1.removed) continue;
+
+					for (let j = 0; j < points.length; j++) {
+						if (i === j) continue;
+
+						const p2 = points[j];
+						if (p2.removed) continue;
+
+						// Don't combine two expanded points
+						if (p1.expanded && p2.expanded) continue;
+
+						// Calculate distance
+						const dx = p1.x - p2.x;
+						const dy = p1.y - p2.y;
+						const distance = Math.sqrt(dx * dx + dy * dy);
+
+						// If distance is less than combination threshold, combine points
+						if (distance <= this.combinationDistance) {
+							const combined = this.combinePoints(p1.id, p2.id);
+							if (combined) {
+								combinedPoints = true;
+								break;
+							}
+						}
+					}
+
+					if (combinedPoints) break;
+				}
+
+				return combinedPoints;
+			}
+
+			combinePoints(sourceId, targetId) {
+				const sourcePoint = this.points.find((p) => p.id === sourceId && !p.removed);
+				const targetPoint = this.points.find((p) => p.id === targetId && !p.removed);
+
+				if (!sourcePoint || !targetPoint) return false;
+
+				// If both points are expanded, don't combine them
+				if (sourcePoint.expanded && targetPoint.expanded) return false;
+
+				// Choose which point to keep with updated priority:
+				// 1. Prefer code types (cpt, icd10) over non-code types (step, note)
+				// 2. Prefer reasoning steps (step) over medical notes (note)
+				// 3. If one point is expanded, keep that one
+				// 4. Otherwise, prefer the one with lower ID
+				let keepPoint, removePoint;
+
+				// Define helper functions to check point types
+				const isPerson = (point) => point.codeType === "people";
+				const isSignal = (point) => point.codeType === "signals";
+				const isEvent = (point) => point.codeType === "events";
+				const isEngagement = (point) => point.codeType === "engagement_types";
+				const isRole = (point) => point.codeType === "roles_tags";
+
+				// Apply prioritization rules - prefer people > signals > events > engagement > roles
+				if (isPerson(sourcePoint) && !isPerson(targetPoint)) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (isPerson(targetPoint) && !isPerson(sourcePoint)) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else if (isSignal(sourcePoint) && !isSignal(targetPoint) && !isPerson(targetPoint)) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (isSignal(targetPoint) && !isSignal(sourcePoint) && !isPerson(sourcePoint)) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else if (isEvent(sourcePoint) && !isEvent(targetPoint) && !isPerson(targetPoint) && !isSignal(targetPoint)) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (isEvent(targetPoint) && !isEvent(sourcePoint) && !isPerson(sourcePoint) && !isSignal(sourcePoint)) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else if (
+					isEngagement(sourcePoint) &&
+					!isEngagement(targetPoint) &&
+					!isPerson(targetPoint) &&
+					!isSignal(targetPoint) &&
+					!isEvent(targetPoint)
+				) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (
+					isEngagement(targetPoint) &&
+					!isEngagement(sourcePoint) &&
+					!isPerson(sourcePoint) &&
+					!isSignal(sourcePoint) &&
+					!isEvent(sourcePoint)
+				) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else if (
+					isRole(sourcePoint) &&
+					!isRole(targetPoint) &&
+					!isPerson(targetPoint) &&
+					!isSignal(targetPoint) &&
+					!isEvent(targetPoint) &&
+					!isEngagement(targetPoint)
+				) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (
+					isRole(targetPoint) &&
+					!isRole(sourcePoint) &&
+					!isPerson(sourcePoint) &&
+					!isSignal(sourcePoint) &&
+					!isEvent(sourcePoint) &&
+					!isEngagement(sourcePoint)
+				) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else if (sourcePoint.expanded) {
+					keepPoint = sourcePoint;
+					removePoint = targetPoint;
+				} else if (targetPoint.expanded) {
+					keepPoint = targetPoint;
+					removePoint = sourcePoint;
+				} else {
+					keepPoint = sourceId < targetId ? sourcePoint : targetPoint;
+					removePoint = sourceId < targetId ? targetPoint : sourcePoint;
+				}
+
+				const removeId = removePoint.id;
+
+				// Find and remove all connections involving the removed point
+				this.removeConnectionsForPoint(removeId);
+
+				// Track combined points
+				if (!keepPoint.combinedWith) keepPoint.combinedWith = [];
+				if (removePoint.combinedWith) {
+					// Add all points the removed point had combined with
+					keepPoint.combinedWith.push(...removePoint.combinedWith);
+				}
+				keepPoint.combinedWith.push(removeId);
+
+				// Mark the second point as removed
+				removePoint.removed = true;
+
+				// Animate the merging
+				const keepGroup = document.getElementById(`point-${keepPoint.id}`);
+				const removeGroup = document.getElementById(`point-${removeId}`);
+
+				if (keepGroup && removeGroup) {
+					// Create a ripple effect at the kept point's position
+					let rippleColor;
+					if (keepPoint.codeType === "people") {
+						rippleColor = COLORS.PEOPLE;
+					} else if (keepPoint.codeType === "signals") {
+						rippleColor = COLORS.SIGNALS;
+					} else if (keepPoint.codeType === "events") {
+						rippleColor = COLORS.EVENTS;
+					} else if (keepPoint.codeType === "engagement_types") {
+						rippleColor = COLORS.ENGAGEMENT;
+					} else if (keepPoint.codeType === "roles_tags") {
+						rippleColor = COLORS.ROLES;
+					} else {
+						rippleColor = COLORS.FALLBACK;
+					}
+
+					this.createAbsorptionRipple(keepPoint.x, keepPoint.y, rippleColor);
+
+					// Animate the removed point moving toward the kept point
+					anime({
+						targets: removeGroup,
+						translateX: [removePoint.x, keepPoint.x],
+						translateY: [removePoint.y, keepPoint.y],
+						scale: [1, 0.5],
+						opacity: [1, 0],
+						duration: 300,
+						easing: "easeOutQuad",
+						complete: () => {
+							// Remove the element from the DOM
+							if (removeGroup.parentNode) {
+								removeGroup.parentNode.removeChild(removeGroup);
+							}
+						},
+					});
+
+					// If the point is expanded, update the text box while maintaining expanded appearance
+					if (keepPoint.expanded) {
+						// Get the text element
+						const text = document.getElementById(`text-${keepPoint.id}`);
+
+						// Pulse the text to indicate absorption while keeping it visible
+						if (text) {
+							anime({
+								targets: text,
+								scale: [1, 1.1, 1],
+								duration: 400,
+								easing: "easeOutQuad",
+							});
+						}
+
+						// Update the rectangle but maintain expanded appearance
+						const keptRect = document.getElementById(`rect-${keepPoint.id}`);
+						if (keptRect) {
+							anime({
+								targets: keptRect,
+								scale: [1, 1.1, 1], // Slight pulse effect
+								duration: 600,
+								easing: "easeOutElastic(1, .5)",
+								complete: () => {
+									this.updatePointAppearance(keepPoint.id);
+								}
+							});
+						} else {
+							this.updatePointAppearance(keepPoint.id);
+						}
+					} else {
+						// Normal non-expanded point absorption
+						const keptRect = document.getElementById(`rect-${keepPoint.id}`);
+						if (keptRect) {
+							anime({
+								targets: keptRect,
+								scale: [1, 1.1, 1], // Slight pulse effect
+								duration: 600,
+								easing: "easeOutElastic(1, .5)",
+								complete: () => {
+									this.updatePointAppearance(keepPoint.id);
+								}
+							});
+						} else {
+							this.updatePointAppearance(keepPoint.id);
+						}
+					}
+
+					return true;
+				}
+
+				// If animation couldn't be performed, still update data
+				removePoint.removed = true;
+
+				return true;
+			}
+
+			// Method to remove connections for a specific point
+			removeConnectionsForPoint(pointId) {
+				// Find connections involving this point
+				const connectionsToRemove = this.connections.filter(
+					(conn) => conn.sourceId === pointId || conn.targetId === pointId,
+				);
+
+				// Remove each connection's SVG line from the DOM with animation
+				connectionsToRemove.forEach((conn) => {
+					const line = document.getElementById(`conn-${conn.id}`);
+					if (line) {
+						// Animate the line fading out
+						anime({
+							targets: line,
+							opacity: 0,
+							duration: 300,
+							easing: "easeOutQuad",
+							complete: () => {
+								// Remove the line from the DOM
+								if (line && line.parentNode) {
+									line.parentNode.removeChild(line);
+								}
+							},
+						});
+					}
+				});
+
+				// Filter out the connections involving this point
+				this.connections = this.connections.filter((conn) => conn.sourceId !== pointId && conn.targetId !== pointId);
+			}
+
+			createAbsorptionRipple(x, y, color) {
+				const effectsLayer = document.getElementById("effects-layer");
+				if (!effectsLayer) return;
+
+				// Create a circle element for the ripple
+				const ripple = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				const rippleId = `ripple-${Date.now()}`;
+				ripple.setAttribute("id", rippleId);
+				ripple.setAttribute("cx", x.toString());
+				ripple.setAttribute("cy", y.toString());
+				ripple.setAttribute("r", "0");
+				ripple.setAttribute("fill", "none");
+				ripple.setAttribute("stroke", color);
+				ripple.setAttribute("stroke-width", "1.5");
+				ripple.setAttribute("opacity", "0.8");
+
+				// Add the ripple to the effects layer
+				effectsLayer.appendChild(ripple);
+
+				// Animate the ripple expanding and fading out
+				anime({
+					targets: ripple,
+					r: [0, 50],
+					opacity: [0.4, 0],
+					strokeWidth: [5, 0.5],
+					duration: 800,
+					easing: "easeOutExpo",
+					complete: () => {
+						// Remove the ripple element when animation is complete
+						if (ripple.parentNode) {
+							ripple.parentNode.removeChild(ripple);
+						}
+					},
+				});
+			}
+
+			updatePointAppearance(pointId) {
+				const point = this.points.find((p) => p.id === pointId);
+				if (!point) return;
+
+				const rect = document.getElementById(`rect-${pointId}`);
+				if (!rect) return;
+
+				// Update the stroke color
+				let strokeColor;
+				if (point.codeType === "people") {
+					strokeColor = COLORS.PEOPLE;
+				} else if (point.codeType === "signals") {
+					strokeColor = COLORS.SIGNALS;
+				} else if (point.codeType === "events") {
+					strokeColor = COLORS.EVENTS;
+				} else if (point.codeType === "engagement_types") {
+					strokeColor = COLORS.ENGAGEMENT;
+				} else if (point.codeType === "roles_tags") {
+					strokeColor = COLORS.ROLES;
+				} else {
+					strokeColor = COLORS.FALLBACK;
+				}
+				rect.setAttribute("stroke", strokeColor);
+			}
+
+			// Calculate connections between points
+			calculateConnections() {
+				// Get only valid points (not removed)
+				const validPoints = this.points.filter((p) => !p.removed);
+				const k = 2; // Number of nearest neighbors to track (reduced from 5 to 2 to match example)
+				const connections = [];
+				const currentTime = Date.now();
+
+				// Calculate distances between all points
+				for (let i = 0; i < validPoints.length; i++) {
+					const p1 = validPoints[i];
+
+					// Store distances to all other points
+					const distances = [];
+
+					for (let j = 0; j < validPoints.length; j++) {
+						if (i === j) continue;
+
+						const p2 = validPoints[j];
+						const dx = p1.x - p2.x;
+						const dy = p1.y - p2.y;
+						const distance = Math.sqrt(dx * dx + dy * dy);
+
+						// Only include points that are not too far away
+						if (distance <= this.maxConnectionCreateDistance) {
+							distances.push({
+								index: j,
+								distance
+							});
+						}
+					}
+
+					// Sort by distance and take k nearest
+					distances.sort((a, b) => a.distance - b.distance);
+
+					// Add connections (avoid duplicates by only adding if i < neighbor.index)
+					for (let n = 0; n < Math.min(k, distances.length); n++) {
+						const neighborIdx = distances[n].index;
+						if (i < neighborIdx) {
+							const p2 = validPoints[neighborIdx];
+							const connectionId = `${p1.id}-${p2.id}`;
+
+							// Create connection object with creation timestamp
+							connections.push({
+								id: connectionId,
+								x1: p1.x,
+								y1: p1.y,
+								x2: p2.x,
+								y2: p2.y,
+								sourceId: p1.id,
+								targetId: p2.id,
+								active: true,
+								createdAt: currentTime,
+							});
+						}
+					}
+				}
+
+				return connections;
+			}
+
+			// Create SVG line elements for all connections
+			createConnectionLines() {
+				if (!this.showConnections) return;
+
+				const linesLayer = document.getElementById("lines-layer");
+				if (!linesLayer) return;
+
+				// Clear existing lines first
+				while (linesLayer.firstChild) {
+					linesLayer.removeChild(linesLayer.firstChild);
+				}
+
+				// Create lines for all connections
+				this.connections.forEach((conn) => {
+					const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+					line.setAttribute("id", `conn-${conn.id}`);
+					line.setAttribute("x1", conn.x1.toString());
+					line.setAttribute("y1", conn.y1.toString());
+					line.setAttribute("x2", conn.x2.toString());
+					line.setAttribute("y2", conn.y2.toString());
+					line.setAttribute("stroke", COLORS.CONNECTION);
+					line.setAttribute("stroke-width", "1.5");
+					line.setAttribute("opacity", "0"); // Start invisible
+
+					// Add to the lines layer
+					linesLayer.appendChild(line);
+				});
+
+				// Animate all the lines appearing
+				const connectionLines = document.querySelectorAll('line[id^="conn-"]');
+				anime({
+					targets: connectionLines,
+					opacity: [0, 1],
+					duration: 500,
+					delay: anime.stagger(50),
+					easing: "easeInOutQuad",
+				});
+			}
+		}
+
+		// Initialize the animation when the page loads
+		window.addEventListener('load', () => {
+			const container = document.getElementById('container');
+			const anim = new KnowledgeGraphAnimation(container);
+			anim.handleClick();
+		});
+	</script>
 </body>
 
 </html>
